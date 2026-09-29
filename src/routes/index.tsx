@@ -23,6 +23,15 @@ const tools = [
   { id: "tailor", label: "Tailor each application", title: "Make every application feel written for the role.", copy: "Match your strongest experience to the job description without rebuilding your CV from scratch.", icon: Target, tone: "bg-sky" },
 ];
 
+const fallbackTool = { id: "build", label: "Build your CV", title: "Turn your experience into a CV worth reading.", copy: "Choose a polished template and fill each section with focused guidance. JobPrimed keeps formatting tidy while you focus on your story.", icon: WandSparkles, tone: "bg-coral-soft" };
+
+const faqs = [
+  { question: "Can I build a CV for free?", answer: "Yes. You can build and preview your CV for free, then choose whether you need advanced tools." },
+  { question: "Will my CV work with ATS software?", answer: "Our layouts are designed for clean parsing, clear hierarchy and readable formatting used by modern applicant tracking systems." },
+  { question: "Can I tailor one CV to different jobs?", answer: "Yes. Keep your core career history, then create focused versions for each role." },
+  { question: "Is JobPrimed only for experienced professionals?", answer: "Not at all. The guided flow works for students, career changers and experienced professionals alike." },
+];
+
 const samples = [
   { name: "Growth Marketer", field: "Marketing", score: 94, tone: "bg-coral-soft", person: "Noah Williams" },
   { name: "Product Designer", field: "Design", score: 91, tone: "bg-sky", person: "Maya Chen" },
@@ -32,7 +41,7 @@ const samples = [
 function HomePage() {
   const [active, setActive] = useState("build");
   const [filter, setFilter] = useState("All");
-  const tool = tools.find((item) => item.id === active) ?? tools[0];
+  const tool = tools.find((item) => item.id === active) ?? fallbackTool;
   const visible = filter === "All" ? samples : samples.filter((s) => s.field === filter);
   return <div className="overflow-hidden bg-background text-foreground"><SiteHeader />
     <main>
@@ -70,7 +79,7 @@ function HomePage() {
 
       <section id="pricing" className="mx-auto max-w-5xl px-5 py-20 sm:py-28"><div className="grid overflow-hidden border border-ink md:grid-cols-[1.25fr_.75fr]"><div className="bg-ink p-8 text-paper sm:p-12"><p className="text-xs font-bold uppercase tracking-[.16em] text-coral-soft">Start for free</p><h2 className="mt-4 font-display text-4xl sm:text-5xl">One great CV can change the conversation.</h2><p className="mt-5 max-w-lg text-paper/70">Build and preview your CV at no cost. Upgrade when you’re ready for unlimited versions and advanced tailoring.</p></div><div className="bg-coral-soft p-8 sm:p-12"><p className="text-sm font-bold">JobPrimed Pro</p><p className="mt-2 font-display text-5xl">₦4,500</p><p className="text-sm text-muted-foreground">per month</p><ul className="my-6 space-y-3 text-sm">{["Unlimited CVs","ATS checks","Job-specific tailoring","Priority expert review"].map(x=><li key={x} className="flex gap-2"><Check className="size-4 text-primary"/>{x}</li>)}</ul><Button variant="ink" size="lg" className="w-full" asChild><Link to="/builder">Start building</Link></Button></div></div></section>
 
-      <section id="faq" className="border-t border-line bg-paper py-20"><div className="mx-auto grid max-w-5xl gap-10 px-5 md:grid-cols-[.65fr_1.35fr]"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-primary">Questions, answered</p><h2 className="mt-3 font-display text-4xl">Before you begin.</h2></div><Accordion type="single" collapsible>{[["Can I build a CV for free?","Yes. You can build and preview your CV for free, then choose whether you need advanced tools."],["Will my CV work with ATS software?","Our layouts are designed for clean parsing, clear hierarchy and readable formatting used by modern applicant tracking systems."],["Can I tailor one CV to different jobs?","Yes. Keep your core career history, then create focused versions for each role."],["Is JobPrimed only for experienced professionals?","Not at all. The guided flow works for students, career changers and experienced professionals alike."]].map(([q,a])=><AccordionItem value={q} key={q}><AccordionTrigger className="py-6 text-left text-base font-bold hover:no-underline">{q}</AccordionTrigger><AccordionContent className="max-w-xl pb-6 leading-6 text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></div></section>
+      <section id="faq" className="border-t border-line bg-paper py-20"><div className="mx-auto grid max-w-5xl gap-10 px-5 md:grid-cols-[.65fr_1.35fr]"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-primary">Questions, answered</p><h2 className="mt-3 font-display text-4xl">Before you begin.</h2></div><Accordion type="single" collapsible>{faqs.map((item)=><AccordionItem value={item.question} key={item.question}><AccordionTrigger className="py-6 text-left text-base font-bold hover:no-underline">{item.question}</AccordionTrigger><AccordionContent className="max-w-xl pb-6 leading-6 text-muted-foreground">{item.answer}</AccordionContent></AccordionItem>)}</Accordion></div></section>
     </main>
     <footer className="bg-ink text-paper"><div className="mx-auto max-w-7xl px-5 py-12 lg:px-8"><div className="flex flex-col justify-between gap-8 border-b border-paper/15 pb-10 sm:flex-row"><div><p className="font-display text-3xl">JobPrimed</p><p className="mt-2 max-w-xs text-sm text-paper/60">Build your story. Prime your future.</p></div><div className="grid grid-cols-2 gap-x-14 gap-y-3 text-sm text-paper/70"><a href="#tools">CV tools</a><a href="#examples">Examples</a><a href="#how">How it works</a><a href="#faq">FAQ</a></div></div><div className="flex flex-col justify-between gap-3 pt-6 text-xs text-paper/45 sm:flex-row"><p>© 2026 JobPrimed. All rights reserved.</p><p>Made for ambitious job seekers.</p></div></div></footer>
   </div>;
