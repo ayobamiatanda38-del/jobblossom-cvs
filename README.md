@@ -1,5 +1,5 @@
 # Kickass CV Creator
-
+deploy trigger
 Use the Jobprimed.com repository and transform it into a standard CV curation site modelled exactly on the Kickeresume.com
 
 This project was built with [Lovable](https://lovable.dev).
