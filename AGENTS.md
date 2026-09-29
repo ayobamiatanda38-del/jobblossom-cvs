@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep JobPrimed’s public experience in reusable shared site components, with the interactive CV editor isolated at `/builder`, so marketing and product workflows stay independently maintainable.
+- Model builder monetization as explicit free/Pro capabilities in the `/builder` UI, with payment processing remaining a separate integration, so access states never imply a live charge.
