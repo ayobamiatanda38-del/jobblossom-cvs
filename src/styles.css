@@ -188,3 +188,16 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
+
+@utility cv-accent { color: var(--cv); }
+@utility cv-bg { background-color: var(--cv); }
+@utility cv-border { border-color: var(--cv); }
+@utility cv-soft { background-color: color-mix(in oklab, var(--cv) 12%, var(--paper)); }
+@utility preserve-3d { transform-style: preserve-3d; }
+@utility perspective-card { perspective: 1400px; }
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; transform: none !important; }
+}

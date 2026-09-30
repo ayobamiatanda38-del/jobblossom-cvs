@@ -1,8 +1,11 @@
 # Roadmap
 
-- [x] Rebuild `/builder` as a three-pane CV editing workspace.
-- [x] Add comprehensive CV content sections and editing controls.
-- [x] Add original JobPrimed templates with free and Pro access states.
-- [x] Add template switching, zoom, preview, and download controls.
-- [x] Add a transparent demo checkout flow for JobPrimed Pro.
-- [ ] Verify desktop and mobile editor, Pro unlock, and download flow.
+- [x] Real login / signup (email + Google) with session-aware header
+- [x] 16 editable templates across industries, none greyed out
+- [x] Interactive 3D homepage CV
+- [x] Prices shown in USD
+- [x] Editor: Kickresume-style modular sections, Pro locks, template switcher
+- [ ] Checkout: USD prices, charged in NGN (live charging needs a Nigerian payment provider key)
+- [x] Mobile-optimized builder, template previews, checkout
+- [x] Autosave editor changes
+- [x] Polished PDF export
