@@ -9,3 +9,10 @@
 - [x] Mobile-optimized builder, template previews, checkout
 - [x] Autosave editor changes
 - [x] Polished PDF export
+
+- [x] Homepage cookie choice and legal consent for sign-in/sign-up
+- [ ] Reliable Google account entry and first-sign-in welcome email (sender domain required)
+- [x] Readable diverse CV previews and export
+- [x] ATS checker, cover letter, resignation letter tools
+- [x] Premium-only optional CV sections and signed-in downloads
+- [x] Placeholder guidance in editor

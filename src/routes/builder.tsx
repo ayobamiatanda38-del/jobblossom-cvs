@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft, Award, BookOpen, BriefcaseBusiness, Check, ChevronDown, ChevronLeft, ChevronRight,
   CircleUserRound, CloudCheck, Download, Eye, FileText, FolderKanban, GraduationCap, Languages,
@@ -37,13 +37,13 @@ const SECTIONS: { id: SectionId; label: string; icon: typeof FileText; pro?: boo
   { id: "experience", label: "Experience", icon: BriefcaseBusiness },
   { id: "education", label: "Education", icon: GraduationCap },
   { id: "skills", label: "Skills", icon: Lightbulb },
-  { id: "projects", label: "Projects", icon: FolderKanban },
-  { id: "languages", label: "Languages", icon: Languages },
-  { id: "references", label: "References", icon: Users },
+  { id: "projects", label: "Projects", icon: FolderKanban, pro: true },
+  { id: "languages", label: "Languages", icon: Languages, pro: true },
+  { id: "references", label: "References", icon: Users, pro: true },
   { id: "strengths", label: "Strengths", icon: Award, pro: true },
   { id: "courses", label: "Certifications", icon: BookOpen, pro: true },
   { id: "awards", label: "Awards", icon: Trophy, pro: true },
-  { id: "design", label: "Design", icon: Palette },
+  { id: "design", label: "Design", icon: Palette, pro: true },
 ];
 const ACCENTS = [
   { c: "oklch(0.62 0.2 31)" }, { c: "oklch(0.45 0.12 250)" }, { c: "oklch(0.35 0.06 160)" }, { c: "oklch(0.25 0.02 270)" },
@@ -55,13 +55,16 @@ const TIPS: Partial<Record<SectionId, string[]>> = {
   skills: ["Mirror keywords from the job description.", "Separate skills with commas."],
 };
 const STORE = "jobprimed:cv:v1";
+const emptyCV = (t: string): ResumeData => ({ ...getTemplate(t).sample, name: "", title: "", email: "", phone: "", location: "", website: "", summary: "", experience: [], education: [], skills: "", strengths: "", projects: "", languages: "", courses: "", awards: "", references: "" });
+const freeCV = (d: ResumeData): ResumeData => ({ ...d, projects: "", languages: "", references: "", strengths: "", courses: "", awards: "" });
 const PRO_KEY = "jobprimed:pro";
 
 function BuilderPage() {
   const search = Route.useSearch();
   const { user } = useSession();
+  const navigate = useNavigate();
   const [templateId, setTemplateId] = useState(search.template ?? "prime");
-  const [data, setData] = useState<ResumeData>(getTemplate(search.template).sample);
+  const [data, setData] = useState<ResumeData>(emptyCV(search.template ?? "prime"));
   const [accent, setAccent] = useState<string | undefined>();
   const [active, setActive] = useState<SectionId>("personal");
   const [view, setView] = useState<"edit" | "preview">("edit");
@@ -109,9 +112,18 @@ function BuilderPage() {
   const needPro = () => setCheckoutOpen(true);
   const pick = (id: SectionId) => { const s = SECTIONS.find((x) => x.id === id)!; if (s.pro && !isPro) return needPro(); setActive(id); };
   const idx = SECTIONS.findIndex((s) => s.id === active);
-  const go = (d: number) => { const n = SECTIONS[idx + d]; if (n) pick(n.id); };
-  const unlock = () => { localStorage.setItem(PRO_KEY, "1"); setIsPro(true); };
+  const go = (d: number) => {
+    let next = idx + d;
+    while (SECTIONS[next]?.pro && !isPro) next += d;
+    const n = SECTIONS[next];
+    if (n) setActive(n.id);
+  };
   const locked = t.pro && !isPro;
+  const download = () => {
+    if (!user) { navigate({ to: "/auth", search: { mode: "signup" } }); return; }
+    if (locked) { needPro(); return; }
+    setExportOpen(true);
+  };
 
   return <div className="min-h-screen bg-muted text-foreground">
     <header className="sticky top-0 z-40 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-line bg-paper px-2 sm:h-16 sm:px-5">
@@ -127,7 +139,7 @@ function BuilderPage() {
         {!user && <Button variant="ghost" size="sm" className="hidden md:inline-flex" asChild><Link to="/auth" search={{ mode: "signin" }}>Log in</Link></Button>}
         {isPro ? <span className="hidden rounded-full bg-mint px-3 py-1 text-xs font-bold text-mint-strong sm:inline">Pro</span>
           : <Button variant="secondary" size="sm" onClick={needPro}><Sparkles /><span className="hidden sm:inline">Upgrade</span></Button>}
-        <Button variant="ink" size="sm" onClick={() => locked ? needPro() : setExportOpen(true)}><Download /><span className="hidden sm:inline">Download PDF</span></Button>
+        <Button variant="ink" size="sm" onClick={download}><Download /><span className="hidden sm:inline">Download PDF</span></Button>
       </div>
     </header>
 
@@ -140,7 +152,7 @@ function BuilderPage() {
       <nav className="sticky top-16 hidden h-[calc(100vh-64px)] overflow-y-auto border-r border-line bg-paper p-3 lg:block">
         <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-muted-foreground">CV sections</p>
         {SECTIONS.map((s) => <Button key={s.id} variant="ghost" onClick={() => pick(s.id)} className={`h-10 w-full justify-start px-2 ${active === s.id ? "bg-coral-soft text-ink" : "text-muted-foreground"}`}><s.icon /><span className="flex-1 text-left">{s.label}</span>{s.pro && !isPro && <LockKeyhole className="size-3.5" />}</Button>)}
-        <button onClick={() => setTemplateOpen(true)} className="mt-4 w-full border border-line p-2 text-left hover:border-ink"><div className="pointer-events-none"><ResumePreview data={data} template={t} accent={accent} /></div><p className="mt-2 flex items-center justify-between text-xs font-bold">Change template<ChevronRight className="size-3.5" /></p></button>
+        <button onClick={() => setTemplateOpen(true)} className="mt-4 w-full border border-line p-2 text-left hover:border-ink"><div className="pointer-events-none"><ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} /></div><p className="mt-2 flex items-center justify-between text-xs font-bold">Change template<ChevronRight className="size-3.5" /></p></button>
       </nav>
 
       <section className={`${view === "edit" ? "block" : "hidden"} border-r border-line bg-background pb-24 lg:block lg:pb-0`}>
@@ -150,7 +162,7 @@ function BuilderPage() {
           <div className="mt-6"><Editor active={active} data={data} up={up} isPro={isPro} needPro={needPro} accent={accent ?? t.accent} setAccent={setAccent} openTemplates={() => setTemplateOpen(true)} templateName={t.name} /></div>
           {TIPS[active] && <div className="mt-6 border border-line bg-sky/60 p-4 text-sm"><p className="mb-2 flex items-center gap-2 font-bold"><Lightbulb className="size-4 text-primary" />Recruiter tips</p><ul className="list-disc space-y-1 pl-5 text-muted-foreground">{TIPS[active]!.map((x) => <li key={x}>{x}</li>)}</ul></div>}
           <div className="mt-8 flex justify-between"><Button variant="ghost" disabled={idx === 0} onClick={() => go(-1)}><ChevronLeft />Back</Button>
-            {active === "design" ? <Button onClick={() => locked ? needPro() : setExportOpen(true)}><Download />Finish & download</Button> : <Button onClick={() => go(1)}>Next<ChevronRight /></Button>}</div>
+            {(active === "design" || (!isPro && active === "skills")) ? <Button onClick={download}><Download />Finish & download</Button> : <Button onClick={() => go(1)}>Next<ChevronRight /></Button>}</div>
         </div>
       </section>
 
@@ -161,7 +173,7 @@ function BuilderPage() {
         </div>
         <div className="flex justify-center overflow-auto p-3 sm:p-8">
           <div className="relative w-full max-w-[640px] origin-top transition-transform" style={{ transform: `scale(${zoom / 100})` }}>
-            <ResumePreview data={data} template={t} accent={accent} />
+            <ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} />
             {locked && <div className="absolute inset-x-0 bottom-6 mx-auto w-fit rounded-full bg-ink px-4 py-2 text-xs font-bold text-paper">Pro template · <button className="underline" onClick={needPro}>Unlock to download</button></div>}
           </div>
         </div>
@@ -175,7 +187,7 @@ function BuilderPage() {
     </div>
 
     {/* hidden full-size render for PDF */}
-    <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 w-[794px]"><div id="cv-export"><ResumePreview data={data} template={t} accent={accent} className="shadow-none" /></div></div>
+    <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 w-[794px]"><div id="cv-export"><ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} className="shadow-none" /></div></div>
 
     <TemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} data={data} current={templateId} isPro={isPro} onPick={(id) => { setTemplateId(id); setAccent(undefined); setTemplateOpen(false); }} />
     <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} email={user?.email} paid={paid} />
@@ -187,7 +199,7 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   active: SectionId; data: ResumeData; up: <K extends keyof ResumeData>(k: K, v: ResumeData[K]) => void; isPro: boolean; needPro: () => void;
   accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string;
 }) {
-  const text = (k: keyof ResumeData, label: string, hint?: string) => <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={data[k] as string} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}</div>;
+  const text = (k: keyof ResumeData, label: string, hint?: string) => <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={data[k] as string} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}</div>;
   switch (active) {
     case "personal": return <div className="grid gap-4 sm:grid-cols-2">
       <F label="Full name" v={data.name} on={(v) => up("name", v)} /><F label="Job title" v={data.title} on={(v) => up("title", v)} />
@@ -196,7 +208,7 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
     </div>;
     case "profile": return <div>{text("summary", "Professional summary")}<p className="mt-1 text-right text-xs text-muted-foreground">{data.summary.length} characters</p></div>;
     case "experience": return <List items={data.experience} onChange={(v) => up("experience", v)} blank={{ role: "", company: "", period: "", details: "" }} title={(e) => e.role || "New position"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} onChange={(x) => set({ ...e, details: x.target.value })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /></div></div>} />;
     case "education": return <List items={data.education} onChange={(v) => up("education", v)} blank={{ degree: "", school: "", period: "" }} title={(e) => e.degree || "New qualification"}
       render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
     case "skills": return text("skills", "Skills", "Separate with commas — each becomes a tag.");
@@ -213,9 +225,12 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   }
 }
 
+const PLACEHOLDERS: Partial<Record<keyof ResumeData, string>> = { summary: "Experienced professional with a record of…", skills: "Project management, Data analysis, Communication", projects: "Describe a project and the impact it made…", languages: "English — Native", references: "Available on request", strengths: "Communication, Leadership", courses: "Certification — Issuer, Year", awards: "Award — Organization, Year" };
+const FIELD_HINTS: Record<string, string> = { "Full name": "Your full name", "Job title": "e.g. Product Designer", "Email": "name@example.com", "Phone": "+234 000 000 0000", "City, Country": "Lagos, Nigeria", "Website / LinkedIn": "linkedin.com/in/yourname", "Dates": "Jan 2022 — Present", "Degree": "B.Sc. Computer Science", "School": "University name", "Employer": "Company name", "Email address": "name@example.com" };
+
 function F({ label, v, on }: { label: string; v: string; on: (v: string) => void }) {
   const id = label.toLowerCase().replace(/\W+/g, "-");
-  return <div><Label htmlFor={id}>{label}</Label><Input id={id} className="mt-2 h-11 bg-paper" value={v} onChange={(e) => on(e.target.value)} /></div>;
+  return <div><Label htmlFor={id}>{label}</Label><Input id={id} className="mt-2 h-11 bg-paper" value={v} placeholder={FIELD_HINTS[label] ?? label} onChange={(e) => on(e.target.value)} /></div>;
 }
 
 function List<T>({ items, onChange, blank, title, render }: { items: T[]; onChange: (v: T[]) => void; blank: T; title: (t: T) => string; render: (t: T, set: (t: T) => void) => React.ReactNode }) {

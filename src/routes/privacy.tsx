@@ -1,0 +1,7 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/site-header";
+export const Route = createFileRoute("/privacy")({ head: () => ({ meta: [
+  { title: "Privacy Notice — JobPrimed" }, { name: "description", content: "How JobPrimed handles your account, draft and cookie choices." },
+  { property: "og:title", content: "Privacy Notice — JobPrimed" }, { property: "og:description", content: "Information about JobPrimed account data and browser storage." },
+  { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+] }), component: () => <div className="min-h-screen bg-background"><SiteHeader /><main className="mx-auto max-w-3xl px-5 py-16"><h1 className="font-display text-5xl">Privacy notice</h1><p className="mt-8 leading-7">Your account provider supplies an email address to sign you in. JobPrimed uses that email for account-related messages. Signing in does not subscribe you to newsletters or announcements.</p><p className="mt-5 leading-7">CV drafts and cookie choices are stored in your browser on this device. Essential storage supports sign-in and draft saving even when you reject optional cookies. This site currently does not set optional analytics or advertising cookies.</p><p className="mt-5 leading-7">Payment is handled on Paystack's payment page. You can clear local drafts and your cookie choice through your browser settings.</p></main></div> });

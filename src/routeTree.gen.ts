@@ -10,12 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtsCheckerRouteImport } from './routes/ats-checker'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BuilderRouteImport } from './routes/builder'
+import { Route as CoverLettersRouteImport } from './routes/cover-letters'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResignationLettersRouteImport } from './routes/resignation-letters'
+import { Route as TermsRouteImport } from './routes/terms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtsCheckerRoute = AtsCheckerRouteImport.update({
+  id: '/ats-checker',
+  path: '/ats-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -28,35 +38,100 @@ const BuilderRoute = BuilderRouteImport.update({
   path: '/builder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoverLettersRoute = CoverLettersRouteImport.update({
+  id: '/cover-letters',
+  path: '/cover-letters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResignationLettersRoute = ResignationLettersRouteImport.update({
+  id: '/resignation-letters',
+  path: '/resignation-letters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ats-checker': typeof AtsCheckerRoute
   '/auth': typeof AuthRoute
   '/builder': typeof BuilderRoute
+  '/cover-letters': typeof CoverLettersRoute
+  '/privacy': typeof PrivacyRoute
+  '/resignation-letters': typeof ResignationLettersRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ats-checker': typeof AtsCheckerRoute
   '/auth': typeof AuthRoute
   '/builder': typeof BuilderRoute
+  '/cover-letters': typeof CoverLettersRoute
+  '/privacy': typeof PrivacyRoute
+  '/resignation-letters': typeof ResignationLettersRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ats-checker': typeof AtsCheckerRoute
   '/auth': typeof AuthRoute
   '/builder': typeof BuilderRoute
+  '/cover-letters': typeof CoverLettersRoute
+  '/privacy': typeof PrivacyRoute
+  '/resignation-letters': typeof ResignationLettersRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/builder'
+  fullPaths:
+    | '/'
+    | '/ats-checker'
+    | '/auth'
+    | '/builder'
+    | '/cover-letters'
+    | '/privacy'
+    | '/resignation-letters'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/builder'
-  id: '__root__' | '/' | '/auth' | '/builder'
+  to:
+    | '/'
+    | '/ats-checker'
+    | '/auth'
+    | '/builder'
+    | '/cover-letters'
+    | '/privacy'
+    | '/resignation-letters'
+    | '/terms'
+  id:
+    | '__root__'
+    | '/'
+    | '/ats-checker'
+    | '/auth'
+    | '/builder'
+    | '/cover-letters'
+    | '/privacy'
+    | '/resignation-letters'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtsCheckerRoute: typeof AtsCheckerRoute
   AuthRoute: typeof AuthRoute
   BuilderRoute: typeof BuilderRoute
+  CoverLettersRoute: typeof CoverLettersRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResignationLettersRoute: typeof ResignationLettersRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ats-checker': {
+      id: '/ats-checker'
+      path: '/ats-checker'
+      fullPath: '/ats-checker'
+      preLoaderRoute: typeof AtsCheckerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -82,13 +164,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cover-letters': {
+      id: '/cover-letters'
+      path: '/cover-letters'
+      fullPath: '/cover-letters'
+      preLoaderRoute: typeof CoverLettersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resignation-letters': {
+      id: '/resignation-letters'
+      path: '/resignation-letters'
+      fullPath: '/resignation-letters'
+      preLoaderRoute: typeof ResignationLettersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtsCheckerRoute: AtsCheckerRoute,
   AuthRoute: AuthRoute,
   BuilderRoute: BuilderRoute,
+  CoverLettersRoute: CoverLettersRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResignationLettersRoute: ResignationLettersRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

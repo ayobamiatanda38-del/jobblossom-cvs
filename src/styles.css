@@ -201,3 +201,21 @@
   .print-area, .print-area * { visibility: visible; }
   .print-area { position: absolute; inset: 0; transform: none !important; }
 }
+
+/* Guidance remains a placeholder, never part of the CV or PDF. */
+input::placeholder, textarea::placeholder { color: color-mix(in oklab, var(--muted-foreground) 56%, transparent); opacity: 1; transition: opacity .15s ease; }
+input:focus::placeholder, textarea:focus::placeholder { opacity: 0; }
+.cv-root { container-type: inline-size; overflow-wrap: anywhere; }
+.cv-root [class*="grid-cols-"] > * { min-width: 0; }
+.cv-root li { overflow-wrap: anywhere; }
+@container (min-width: 600px) {
+  .cv-root h3 { font-size: 14px !important; margin-bottom: 9px !important; }
+  .cv-root p, .cv-root li, .cv-root span { font-size: 12px; line-height: 1.48; }
+  .cv-root h1 { font-size: 30px; line-height: 1.13; }
+  .cv-root section { break-inside: avoid; }
+}
+.cv-root h3 { font-size: clamp(8px, 1.76cqw, 14px); }
+.cv-root section p, .cv-root section li, .cv-root section span, .cv-root header span, .cv-root header p, .cv-root aside p { font-size: clamp(7px, 1.51cqw, 12px); line-height: 1.5; }
+.cv-root section li { padding-bottom: 2px; }
+.cv-root section { margin-bottom: clamp(8px, 1.4cqw, 15px); }
+.cv-root h1 { font-size: clamp(15px, 3.78cqw, 30px); }
