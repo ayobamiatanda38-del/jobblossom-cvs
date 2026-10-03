@@ -11,8 +11,11 @@
 - [x] Polished PDF export
 
 - [x] Homepage cookie choice and legal consent for sign-in/sign-up
-- [ ] Reliable Google account entry and first-sign-in welcome email (sender domain required)
+- [x] Google sign-in + separate newsletter opt-in (saved per user)
+- [ ] Welcome email "Athan from JobPrimed" — waiting on jobprimed.com email domain setup
 - [x] Readable diverse CV previews and export
 - [x] ATS checker, cover letter, resignation letter tools
 - [x] Premium-only optional CV sections and signed-in downloads
 - [x] Placeholder guidance in editor
+- [x] AI cover letter drafter at /cover-letter-drafter (POST /api/cover-letter, grounded-only drafting, tone picker, streaming, Stop/Copy) — verified live
+- [x] Resume tailor linked from main nav, homepage tools section and footer
