@@ -20,6 +20,7 @@ import { Route as ResignationLettersRouteImport } from './routes/resignation-let
 import { Route as ResumeTailorRouteImport } from './routes/resume-tailor'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCoverLetterRouteImport } from './routes/api/cover-letter'
+import { Route as ApiSuggestRouteImport } from './routes/api/suggest'
 import { Route as ApiTailorRouteImport } from './routes/api/tailor'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,6 +78,11 @@ const ApiCoverLetterRoute = ApiCoverLetterRouteImport.update({
   path: '/api/cover-letter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSuggestRoute = ApiSuggestRouteImport.update({
+  id: '/api/suggest',
+  path: '/api/suggest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTailorRoute = ApiTailorRouteImport.update({
   id: '/api/tailor',
   path: '/api/tailor',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/resume-tailor': typeof ResumeTailorRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
+  '/api/suggest': typeof ApiSuggestRoute
   '/api/tailor': typeof ApiTailorRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/resume-tailor': typeof ResumeTailorRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
+  '/api/suggest': typeof ApiSuggestRoute
   '/api/tailor': typeof ApiTailorRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/resume-tailor': typeof ResumeTailorRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
+  '/api/suggest': typeof ApiSuggestRoute
   '/api/tailor': typeof ApiTailorRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/resume-tailor'
     | '/terms'
     | '/api/cover-letter'
+    | '/api/suggest'
     | '/api/tailor'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/resume-tailor'
     | '/terms'
     | '/api/cover-letter'
+    | '/api/suggest'
     | '/api/tailor'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/resume-tailor'
     | '/terms'
     | '/api/cover-letter'
+    | '/api/suggest'
     | '/api/tailor'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   ResumeTailorRoute: typeof ResumeTailorRoute
   TermsRoute: typeof TermsRoute
   ApiCoverLetterRoute: typeof ApiCoverLetterRoute
+  ApiSuggestRoute: typeof ApiSuggestRoute
   ApiTailorRoute: typeof ApiTailorRoute
 }
 
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCoverLetterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/suggest': {
+      id: '/api/suggest'
+      path: '/api/suggest'
+      fullPath: '/api/suggest'
+      preLoaderRoute: typeof ApiSuggestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/tailor': {
       id: '/api/tailor'
       path: '/api/tailor'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResumeTailorRoute: ResumeTailorRoute,
   TermsRoute: TermsRoute,
   ApiCoverLetterRoute: ApiCoverLetterRoute,
+  ApiSuggestRoute: ApiSuggestRoute,
   ApiTailorRoute: ApiTailorRoute,
 }
 export const routeTree = rootRouteImport

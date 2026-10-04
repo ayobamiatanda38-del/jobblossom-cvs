@@ -57,6 +57,13 @@ function AuthPage() {
     if (!agreed) { setMsg({ ok: false, text: "Please agree to the terms and privacy notice first." }); return; }
     setBusy(true); setMsg(null); remember();
     try {
+      const onLovableHost = /\.lovable\.app$|^localhost$/.test(window.location.hostname);
+      if (!onLovableHost) {
+        // Off Lovable hosting (e.g. Vercel) the managed sign-in helper is unavailable; use the backend's OAuth directly.
+        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth` } });
+        if (error) setMsg({ ok: false, text: error.message });
+        return;
+      }
       const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
       if (r.error) setMsg({ ok: false, text: String(r.error.message ?? r.error) });
     } catch (e) { setMsg({ ok: false, text: e instanceof Error ? e.message : "Google sign-in could not open. Please try again." }); }

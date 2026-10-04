@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResumePreview } from "@/components/resume-preview";
+import { AiSuggest } from "@/components/ai-suggest";
 import { PLANS, TEMPLATES, INDUSTRIES, formatNGN, formatUSD, getTemplate, USD_TO_NGN, type ResumeData } from "@/lib/templates";
 import { useSession } from "@/hooks/use-session";
 import { useServerFn } from "@tanstack/react-start";
@@ -199,7 +200,8 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   active: SectionId; data: ResumeData; up: <K extends keyof ResumeData>(k: K, v: ResumeData[K]) => void; isPro: boolean; needPro: () => void;
   accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string;
 }) {
-  const text = (k: keyof ResumeData, label: string, hint?: string) => <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={data[k] as string} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}</div>;
+  const join = (a: string, b: string, sep: string) => (a.trim() ? `${a.trim()}${sep}${b}` : b);
+  const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
   switch (active) {
     case "personal": return <div className="grid gap-4 sm:grid-cols-2">
       <F label="Full name" v={data.name} on={(v) => up("name", v)} /><F label="Job title" v={data.title} on={(v) => up("title", v)} />
@@ -208,7 +210,7 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
     </div>;
     case "profile": return <div>{text("summary", "Professional summary")}<p className="mt-1 text-right text-xs text-muted-foreground">{data.summary.length} characters</p></div>;
     case "experience": return <List items={data.experience} onChange={(v) => up("experience", v)} blank={{ role: "", company: "", period: "", details: "" }} title={(e) => e.role || "New position"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
     case "education": return <List items={data.education} onChange={(v) => up("education", v)} blank={{ degree: "", school: "", period: "" }} title={(e) => e.degree || "New qualification"}
       render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
     case "skills": return text("skills", "Skills", "Separate with commas — each becomes a tag.");
