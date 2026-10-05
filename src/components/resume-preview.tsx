@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { getTemplate, type ResumeData, type Template } from "@/lib/templates";
 
 export type { ResumeData };
-type Props = { data?: ResumeData; template?: Template | string; className?: string; accent?: string | undefined };
+type Props = { data?: ResumeData | undefined; template?: Template | string; className?: string; accent?: string | undefined };
 
 /** One physical A4 layout, scaled uniformly for thumbnails and the editor. */
 export function ResumePreview({ data, template, className, accent }: Props) {
