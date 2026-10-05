@@ -205,40 +205,21 @@
 /* Guidance remains a placeholder, never part of the CV or PDF. */
 input::placeholder, textarea::placeholder { color: color-mix(in oklab, var(--muted-foreground) 56%, transparent); opacity: 1; transition: opacity .15s ease; }
 input:focus::placeholder, textarea:focus::placeholder { opacity: 0; }
-.cv-root { position: relative; overflow: hidden; min-width: 0; aspect-ratio: 794 / 1123; }
-.cv-sheet { width: 794px; min-height: 1123px; transform-origin: top left; background: var(--paper); color: var(--ink); font-size: 11pt; line-height: 1.5; letter-spacing: 0; }
-.cv-sheet p, .cv-sheet h1, .cv-sheet h3 { margin: 0; }
-.cv-sheet h1 { font-size: 20pt; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: normal; }
-.cv-header { padding: 42px 42px 24px; }
-.cv-profession { font-size: 12pt; font-weight: 600; margin-top: 6px !important; }
-.cv-contact { display: flex; flex-wrap: wrap; gap: 7px 20px; margin-top: 14px; font-family: var(--font-sans); font-size: 10pt; line-height: 1.45; }
-.cv-contact > div { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
-.cv-contact svg { flex-shrink: 0; width: 13px; height: 13px; margin-top: 3px; }
-.cv-contact span { overflow-wrap: anywhere; }
-.cv-columns { display: grid; grid-template-columns: minmax(0, 1fr) 216px; gap: 28px; padding: 8px 42px 42px; }
-.cv-columns > *, .cv-entry-heading > * { min-width: 0; }
-.cv-stack { display: flex; flex-direction: column; gap: 24px; }
-.cv-section-title { font-family: var(--font-sans); font-size: 14pt; font-weight: 700; line-height: 1.25; padding-bottom: 8px; margin-bottom: 10px !important; border-bottom: 1px solid var(--line); }
-.cv-sheet section { break-inside: avoid; }
-.cv-paragraphs { display: grid; gap: 10px; }
-.cv-paragraphs p { white-space: pre-line; overflow-wrap: break-word; }
-.cv-entries { display: grid; gap: 20px; }
-.cv-entry-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 12px; }
-.cv-job { font-weight: 700; font-size: 11pt; }
-.cv-detail { font-family: var(--font-sans); font-size: 10pt; color: var(--muted-foreground); }
-.cv-employer { font-weight: 600; margin-top: 3px !important; }
-.cv-bullets { list-style: disc; padding-left: 18px; margin: 8px 0 0; }
-.cv-bullets li { padding-left: 2px; margin-bottom: 6px; overflow-wrap: break-word; }
-.cv-skills { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
-.cv-timeline { border-left-width: 2px; padding-left: 14px; }
-.cv-sidebar-columns { grid-template-columns: 260px minmax(0, 1fr); gap: 0; padding: 0; min-height: 943px; }
-.cv-split-columns { grid-template-columns: minmax(0, 1fr) 260px; gap: 0; padding: 0; min-height: 943px; }
-.cv-main { padding: 26px 32px 42px; }
-.cv-sidebar { padding: 26px 28px 42px; }
-.cv-sidebar .cv-contact { display: grid; margin: 0 0 26px; }
-.cv-bg .cv-section-title { color: var(--paper); border-color: color-mix(in oklab, var(--paper) 40%, transparent); }
-.cv-layout-minimal .cv-header { text-align: center; }
-.cv-layout-minimal .cv-contact { justify-content: center; }
-.cv-layout-classic .cv-header, .cv-layout-timeline .cv-header { border-bottom: 2px solid var(--cv); margin: 0 42px 24px; padding-left: 0; padding-right: 0; }
-.cv-layout-split .cv-header { border-left: 6px solid var(--cv); margin: 32px 42px 16px; padding: 4px 0 4px 18px; }
-.cv-layout-banner .cv-columns { padding-top: 30px; }
+/* CV type scale in A4 points (page width = 595pt = 100cqw):
+   name 18pt bold, section titles 14pt bold, body 11.5pt, small details 10.5pt. */
+.cv-root { container-type: inline-size; overflow-wrap: break-word; word-break: normal; hyphens: manual; }
+.cv-root [class*="grid-cols-"] > * { min-width: 0; }
+.cv-root h1 { font-size: 3.03cqw !important; line-height: 1.15; font-weight: 700; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; letter-spacing: 0; }
+.cv-root header p, .cv-root aside > div > p:first-of-type ~ p { font-size: 2.1cqw; }
+.cv-root h3 { font-size: 2.35cqw !important; font-weight: 700; letter-spacing: .06em; margin-bottom: .8cqw !important; padding-bottom: .3cqw; }
+.cv-root section p, .cv-root section li, .cv-root section span, .cv-root aside p, .cv-root header span { font-size: 1.93cqw; line-height: 1.45; }
+.cv-root .cv-small, .cv-root section .cv-small, .cv-root header .cv-small span { font-size: 1.76cqw !important; line-height: 1.4; }
+.cv-root section p.cv-role { font-size: 2.02cqw; font-weight: 700; }
+.cv-root section { margin-bottom: 2.2cqw; break-inside: avoid; }
+.cv-root section ul { padding-left: 1.1em; list-style-position: outside; }
+.cv-root section li { padding-bottom: .25cqw; }
+.cv-root .cv-para { white-space: normal; }
+.cv-root .cv-para > span { display: block; margin-bottom: .7cqw; }
+/* Editor fields: comfortable 12pt-equivalent typing size. */
+.cv-editor input, .cv-editor textarea { font-size: 16px; line-height: 1.55; }
+.cv-editor label { font-size: 14px; }

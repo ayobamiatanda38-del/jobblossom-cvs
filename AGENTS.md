@@ -12,6 +12,5 @@
 - Keep JobPrimed’s public experience in reusable shared site components, with the interactive CV editor isolated at `/builder`, so marketing and product workflows stay independently maintainable.
 - Model builder monetization as explicit free/Pro capabilities in the `/builder` UI, with payment processing remaining a separate integration, so access states never imply a live charge.
 - CV templates and sample content live as data in `src/lib/templates.ts`, rendered by one `ResumePreview` with six layouts, so new templates need no new components.
-- Render resumes on a fixed 794px A4 sheet and scale the whole sheet uniformly for previews; physical typography and alignment must remain identical in galleries, editing, and export.
 - Prices are defined in USD and converted to NGN via `USD_TO_NGN` at checkout, so display and charge currency stay in one place.
 - Editor drafts autosave to localStorage and PDFs are generated client-side (html2canvas-pro + jsPDF) from a hidden A4 render.
