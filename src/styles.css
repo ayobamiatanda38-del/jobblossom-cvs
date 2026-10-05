@@ -205,17 +205,40 @@
 /* Guidance remains a placeholder, never part of the CV or PDF. */
 input::placeholder, textarea::placeholder { color: color-mix(in oklab, var(--muted-foreground) 56%, transparent); opacity: 1; transition: opacity .15s ease; }
 input:focus::placeholder, textarea:focus::placeholder { opacity: 0; }
-.cv-root { container-type: inline-size; overflow-wrap: anywhere; }
-.cv-root [class*="grid-cols-"] > * { min-width: 0; }
-.cv-root li { overflow-wrap: anywhere; }
-@container (min-width: 600px) {
-  .cv-root h3 { font-size: 14px !important; margin-bottom: 9px !important; }
-  .cv-root p, .cv-root li, .cv-root span { font-size: 12px; line-height: 1.48; }
-  .cv-root h1 { font-size: 30px; line-height: 1.13; }
-  .cv-root section { break-inside: avoid; }
-}
-.cv-root h3 { font-size: clamp(8px, 1.76cqw, 14px); }
-.cv-root section p, .cv-root section li, .cv-root section span, .cv-root header span, .cv-root header p, .cv-root aside p { font-size: clamp(7px, 1.51cqw, 12px); line-height: 1.5; }
-.cv-root section li { padding-bottom: 2px; }
-.cv-root section { margin-bottom: clamp(8px, 1.4cqw, 15px); }
-.cv-root h1 { font-size: clamp(15px, 3.78cqw, 30px); }
+.cv-root { position: relative; overflow: hidden; min-width: 0; aspect-ratio: 794 / 1123; }
+.cv-sheet { width: 794px; min-height: 1123px; transform-origin: top left; background: var(--paper); color: var(--ink); font-size: 11pt; line-height: 1.5; letter-spacing: 0; }
+.cv-sheet p, .cv-sheet h1, .cv-sheet h3 { margin: 0; }
+.cv-sheet h1 { font-size: 20pt; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: normal; }
+.cv-header { padding: 42px 42px 24px; }
+.cv-profession { font-size: 12pt; font-weight: 600; margin-top: 6px !important; }
+.cv-contact { display: flex; flex-wrap: wrap; gap: 7px 20px; margin-top: 14px; font-family: var(--font-sans); font-size: 10pt; line-height: 1.45; }
+.cv-contact > div { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+.cv-contact svg { flex-shrink: 0; width: 13px; height: 13px; margin-top: 3px; }
+.cv-contact span { overflow-wrap: anywhere; }
+.cv-columns { display: grid; grid-template-columns: minmax(0, 1fr) 216px; gap: 28px; padding: 8px 42px 42px; }
+.cv-columns > *, .cv-entry-heading > * { min-width: 0; }
+.cv-stack { display: flex; flex-direction: column; gap: 24px; }
+.cv-section-title { font-family: var(--font-sans); font-size: 14pt; font-weight: 700; line-height: 1.25; padding-bottom: 8px; margin-bottom: 10px !important; border-bottom: 1px solid var(--line); }
+.cv-sheet section { break-inside: avoid; }
+.cv-paragraphs { display: grid; gap: 10px; }
+.cv-paragraphs p { white-space: pre-line; overflow-wrap: break-word; }
+.cv-entries { display: grid; gap: 20px; }
+.cv-entry-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 12px; }
+.cv-job { font-weight: 700; font-size: 11pt; }
+.cv-detail { font-family: var(--font-sans); font-size: 10pt; color: var(--muted-foreground); }
+.cv-employer { font-weight: 600; margin-top: 3px !important; }
+.cv-bullets { list-style: disc; padding-left: 18px; margin: 8px 0 0; }
+.cv-bullets li { padding-left: 2px; margin-bottom: 6px; overflow-wrap: break-word; }
+.cv-skills { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.cv-timeline { border-left-width: 2px; padding-left: 14px; }
+.cv-sidebar-columns { grid-template-columns: 260px minmax(0, 1fr); gap: 0; padding: 0; min-height: 943px; }
+.cv-split-columns { grid-template-columns: minmax(0, 1fr) 260px; gap: 0; padding: 0; min-height: 943px; }
+.cv-main { padding: 26px 32px 42px; }
+.cv-sidebar { padding: 26px 28px 42px; }
+.cv-sidebar .cv-contact { display: grid; margin: 0 0 26px; }
+.cv-bg .cv-section-title { color: var(--paper); border-color: color-mix(in oklab, var(--paper) 40%, transparent); }
+.cv-layout-minimal .cv-header { text-align: center; }
+.cv-layout-minimal .cv-contact { justify-content: center; }
+.cv-layout-classic .cv-header, .cv-layout-timeline .cv-header { border-bottom: 2px solid var(--cv); margin: 0 42px 24px; padding-left: 0; padding-right: 0; }
+.cv-layout-split .cv-header { border-left: 6px solid var(--cv); margin: 32px 42px 16px; padding: 4px 0 4px 18px; }
+.cv-layout-banner .cv-columns { padding-top: 30px; }

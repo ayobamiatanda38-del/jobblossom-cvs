@@ -149,14 +149,14 @@ function BuilderPage() {
       {SECTIONS.map((s) => <button key={s.id} onClick={() => pick(s.id)} className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${active === s.id ? "bg-ink text-paper" : "bg-muted text-muted-foreground"}`}><s.icon className="size-3.5" />{s.label}{s.pro && !isPro && <LockKeyhole className="size-3" />}</button>)}
     </div>
 
-    <div className="lg:grid lg:grid-cols-[210px_minmax(380px,460px)_1fr]">
+    <div className="lg:grid lg:grid-cols-[180px_minmax(320px,380px)_minmax(0,1fr)]">
       <nav className="sticky top-16 hidden h-[calc(100vh-64px)] overflow-y-auto border-r border-line bg-paper p-3 lg:block">
         <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-muted-foreground">CV sections</p>
         {SECTIONS.map((s) => <Button key={s.id} variant="ghost" onClick={() => pick(s.id)} className={`h-10 w-full justify-start px-2 ${active === s.id ? "bg-coral-soft text-ink" : "text-muted-foreground"}`}><s.icon /><span className="flex-1 text-left">{s.label}</span>{s.pro && !isPro && <LockKeyhole className="size-3.5" />}</Button>)}
         <button onClick={() => setTemplateOpen(true)} className="mt-4 w-full border border-line p-2 text-left hover:border-ink"><div className="pointer-events-none"><ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} /></div><p className="mt-2 flex items-center justify-between text-xs font-bold">Change template<ChevronRight className="size-3.5" /></p></button>
       </nav>
 
-      <section className={`${view === "edit" ? "block" : "hidden"} border-r border-line bg-background pb-24 lg:block lg:pb-0`}>
+      <section className={`${view === "edit" ? "block" : "hidden"} [&_label]:text-base [&_input]:text-[11pt] [&_textarea]:text-[11pt] [&_textarea]:leading-relaxed border-r border-line bg-background pb-24 lg:block lg:pb-0`}>
         <div className="mx-auto max-w-xl p-4 sm:p-7">
           <p className="text-xs font-bold uppercase text-primary">Step {idx + 1} of {SECTIONS.length}</p>
           <h1 className="mt-1 font-display text-3xl">{SECTIONS[idx]!.label}</h1>
@@ -203,16 +203,16 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   const join = (a: string, b: string, sep: string) => (a.trim() ? `${a.trim()}${sep}${b}` : b);
   const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
   switch (active) {
-    case "personal": return <div className="grid gap-4 sm:grid-cols-2">
+    case "personal": return <div className="grid gap-4 xl:grid-cols-2">
       <F label="Full name" v={data.name} on={(v) => up("name", v)} /><F label="Job title" v={data.title} on={(v) => up("title", v)} />
       <F label="Email" v={data.email} on={(v) => up("email", v)} /><F label="Phone" v={data.phone} on={(v) => up("phone", v)} />
       <F label="City, Country" v={data.location} on={(v) => up("location", v)} /><F label="Website / LinkedIn" v={data.website} on={(v) => up("website", v)} />
     </div>;
     case "profile": return <div>{text("summary", "Professional summary")}<p className="mt-1 text-right text-xs text-muted-foreground">{data.summary.length} characters</p></div>;
     case "experience": return <List items={data.experience} onChange={(v) => up("experience", v)} blank={{ role: "", company: "", period: "", details: "" }} title={(e) => e.role || "New position"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 xl:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="xl:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="xl:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
     case "education": return <List items={data.education} onChange={(v) => up("education", v)} blank={{ degree: "", school: "", period: "" }} title={(e) => e.degree || "New qualification"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 xl:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="xl:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
     case "skills": return text("skills", "Skills", "Separate with commas — each becomes a tag.");
     case "projects": return text("projects", "Projects");
     case "languages": return text("languages", "Languages", "e.g. English — Native · French — Conversational");
@@ -250,7 +250,7 @@ function TemplateDialog({ open, onOpenChange, data, current, isPro, onPick }: { 
     <DialogHeader className="border-b border-line p-5"><DialogTitle className="font-display text-2xl sm:text-3xl">Choose a template</DialogTitle><DialogDescription>Switch anytime — your content stays. Pro templates can be previewed free.</DialogDescription></DialogHeader>
     <div className="flex gap-2 overflow-x-auto px-5 pt-4">{INDUSTRIES.map((x) => <Button key={x} size="sm" variant={f === x ? "ink" : "outline"} onClick={() => setF(x)}>{x}</Button>)}</div>
     <div className="grid grid-cols-2 gap-3 p-5 md:grid-cols-3 lg:grid-cols-4">{list.map((t) => <button key={t.id} onClick={() => onPick(t.id)} className={`border p-2 text-left transition ${current === t.id ? "border-primary bg-coral-soft" : "border-line hover:border-ink"}`}>
-      <div className="pointer-events-none"><ResumePreview data={data} template={t} /></div>
+      <div className="pointer-events-none"><ResumePreview data={data.name.trim() ? data : undefined} template={t} /></div>
       <div className="flex items-center justify-between gap-1 p-1 pt-2"><div className="min-w-0"><p className="truncate text-sm font-bold">{t.name}</p><p className="truncate text-[11px] text-muted-foreground">{t.industry}</p></div>{t.pro && !isPro ? <span className="flex shrink-0 items-center gap-1 rounded-full bg-ink px-2 py-0.5 text-[10px] font-bold text-paper"><LockKeyhole className="size-3" />PRO</span> : current === t.id ? <Check className="size-4 shrink-0 text-primary" /> : null}</div>
     </button>)}</div>
   </DialogContent></Dialog>;
@@ -310,10 +310,22 @@ function ExportDialog({ open, onOpenChange, name }: { open: boolean; onOpenChang
     setState("busy");
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
-      const node = document.getElementById("cv-export")!;
+      const node = document.getElementById("cv-export");
+      if (!node) throw new Error("Resume export is not available");
+      await document.fonts.ready;
       const canvas = await html2canvas(node, { scale: 2.5, backgroundColor: null, useCORS: true });
       const pdf = new jsPDF({ unit: "mm", format: "a4" });
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, 297);
+      const pageHeight = Math.round(canvas.width * 297 / 210);
+      for (let offset = 0; offset < canvas.height; offset += pageHeight) {
+        if (offset > 0) pdf.addPage();
+        const slice = document.createElement("canvas");
+        slice.width = canvas.width;
+        slice.height = Math.min(pageHeight, canvas.height - offset);
+        const context = slice.getContext("2d");
+        if (!context) throw new Error("Could not prepare the PDF page");
+        context.drawImage(canvas, 0, offset, slice.width, slice.height, 0, 0, slice.width, slice.height);
+        pdf.addImage(slice.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, slice.height * 210 / slice.width);
+      }
       pdf.setProperties({ title: `${name} — CV`, creator: "JobPrimed" });
       pdf.save(`${file || "CV"}.pdf`);
       setState("done");

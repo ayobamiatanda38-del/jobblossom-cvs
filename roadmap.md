@@ -1,5 +1,11 @@
 # Roadmap
 
+- [x] Polish all resume layouts: intact names, consistent alignment, paragraphs, and requested print typography
+- [x] Increase fill-in lettering and improve product preview presentation
+- [x] Verify all 16 gallery samples, live editing, autosave, mobile preview, and hidden A4 canvas rendering
+- [ ] Verify signed-in PDF download — no signed-in test session available
+- [ ] Confirm GitHub/Vercel deployment — manual pushes unavailable; connected sync and deployment status unverified
+
 - [x] Real login / signup (email + Google) with session-aware header
 - [x] 16 editable templates across industries, none greyed out
 - [x] Interactive 3D homepage CV
