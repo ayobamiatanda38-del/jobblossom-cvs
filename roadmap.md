@@ -22,3 +22,5 @@
 - [x] AI section suggestions in editor based on job title
 - [x] Kickresume-style CV presentation: names on one line, aligned columns, paragraphing
 - [x] Editor and CV type sizes: name 16-20pt, section titles 14pt, body 11-12pt, details 10-11pt
+- [x] AI routes fall back to OPENAI_API_KEY off-Lovable
+- [ ] Two new templates: ATS Classic, Chronicle

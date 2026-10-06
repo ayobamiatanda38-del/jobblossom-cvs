@@ -21,28 +21,22 @@ export const Route = createFileRoute("/api/cover-letter")({
       POST: async ({ request }) => {
         const parsed = Body.safeParse(await request.json().catch(() => null));
         if (!parsed.success) return Response.json({ error: "Please paste at least a few lines of both your resume and the job description." }, { status: 400 });
-        const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!apiKey) return Response.json({ error: "AI is not configured yet." }, { status: 500 });
-        const { createOpenAI } = await import("@ai-sdk/openai");
+        const { getAiModel } = await import("@/lib/ai/provider.server");
+        const ai = getAiModel(request);
+        if (!ai) return Response.json({ error: "AI is not configured yet." }, { status: 500 });
         const { streamText } = await import("ai");
-        const { createLovableAiGatewayRunIdFetch, getLovableAiGatewayRunId, withLovableAiGatewayRunIdHeader } = await import("@/lib/ai/run-id.server");
-        const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
-        const provider = createOpenAI({
-          baseURL: "https://ai.gateway.lovable.dev/v1",
-          apiKey,
-          headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-          fetch: runIdFetch.fetch,
-        });
+        const { withLovableAiGatewayRunIdHeader } = await import("@/lib/ai/run-id.server");
+        const runIdFetch = ai.runIdFetch;
         const tone = parsed.data.tone ?? "professional";
         let upstreamError: string | undefined;
         const result = streamText({
-          model: provider.responses("openai/gpt-6-astra"),
+          model: ai.model,
           system: SYSTEM,
           messages: [{ role: "user", content: `TONE: ${tone}\n\nJOB DESCRIPTION:\n${parsed.data.job}\n\nMY RESUME:\n${parsed.data.resume}` }],
           abortSignal: request.signal,
           maxRetries: 0,
           onError: ({ error }) => { upstreamError = String((error as { message?: string })?.message ?? error); console.error("cover-letter error", upstreamError); },
-          providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
+          providerOptions: ai.providerOptions,
         });
         const encoder = new TextEncoder();
         const body = new ReadableStream({
