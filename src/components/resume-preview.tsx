@@ -78,6 +78,55 @@ export function ResumePreview({ data, template, className, accent }: Props) {
         </header>
         <div className="grid grid-cols-[64%_36%] gap-5"><Main /><Side /></div>
       </div>}
+
+      {t.layout === "ats" && <div className="p-7">
+        <header>
+          <h1>{d.name}</h1>
+          <p className="cv-small mt-1 text-muted-foreground">{[d.location, d.phone, d.email].filter(Boolean).join(" | ")}</p>
+        </header>
+        <div className="mt-2 space-y-4 [&_h3]:border-b [&_h3]:border-ink/60 [&_h3]:pb-0.5 [&_h3]:text-ink">
+          <Text label="Professional Summary" value={d.summary} />
+          {d.skills && <section><H>Core Competencies</H><p>{d.skills.split(",").map((s) => s.trim()).filter(Boolean).join(" | ")}</p></section>}
+          <section><H>Professional Experience</H><div className="space-y-2.5">{d.experience.map((e, i) => (
+            <div key={i}>
+              <p className="cv-role">{e.company}{d.location ? ` | ${d.location}` : ""}</p>
+              <div className="flex items-baseline justify-between gap-2"><p className="italic">{e.role}</p><p className="cv-small shrink-0 whitespace-nowrap text-muted-foreground">{e.period}</p></div>
+              <ul className="mt-1 list-disc space-y-0.5">{e.details.split("\n").filter(Boolean).map((l, j) => <li key={j}>{l}</li>)}</ul>
+            </div>))}</div></section>
+          {d.projects && <Text label="Key Achievements" value={d.projects} />}
+          <Education />
+          {d.courses && <Text label="Certifications" value={d.courses} />}
+          {d.references && <Text label="References" value={d.references} />}
+        </div>
+      </div>}
+
+      {t.layout === "chronicle" && <div className="p-6 text-[0.92em]">
+        <header className="border-b-2 cv-border pb-2">
+          <h1>{d.name}</h1>
+          <p className="cv-small mt-1 text-muted-foreground">{[d.title, d.location, d.phone, d.email].filter(Boolean).join(" · ")}</p>
+        </header>
+        <div className="mt-3 space-y-4">
+          {d.summary && <section><H>Profile</H><p className="cv-para">{d.summary.split(/\n+/).filter(Boolean).map((l, i) => <span key={i}>{l}</span>)}</p></section>}
+          {d.experience.length > 0 && <section><H>Work Experience</H><div className="space-y-3">{d.experience.map((e, i) => (
+            <div key={i} className="grid grid-cols-[24%_76%] gap-3">
+              <p className="cv-small whitespace-nowrap font-semibold cv-accent">{e.period}</p>
+              <div><p className="cv-role">{e.role}</p><p className="cv-small text-muted-foreground">{e.company}</p>
+                <ul className="mt-1 list-disc space-y-0.5">{e.details.split("\n").filter(Boolean).map((l, j) => <li key={j}>{l}</li>)}</ul></div>
+            </div>))}</div></section>}
+          {d.education.length > 0 && <section><H>Education</H><div className="space-y-2">{d.education.map((e, i) => (
+            <div key={i} className="grid grid-cols-[24%_76%] gap-3">
+              <p className="cv-small whitespace-nowrap font-semibold cv-accent">{e.period}</p>
+              <div><p className="cv-role">{e.degree}</p><p className="cv-small text-muted-foreground">{e.school}</p></div>
+            </div>))}</div></section>}
+          {d.skills && <section><H>Skills</H><p>{d.skills.split(",").map((s) => s.trim()).filter(Boolean).join(", ")}</p></section>}
+          <Text label="Key Areas" value={d.strengths} />
+          <Text label="Awards & Achievements" value={d.awards} />
+          <Text label="Certificates" value={d.courses} />
+          <Text label="Languages" value={d.languages} />
+          <Text label="Hobbies & Interests" value={d.projects} />
+          <Text label="References" value={d.references} />
+        </div>
+      </div>}
     </article>
   );
 }

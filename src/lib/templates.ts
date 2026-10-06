@@ -1,4 +1,4 @@
-export type Layout = "classic" | "sidebar" | "banner" | "minimal" | "split" | "timeline";
+export type Layout = "classic" | "sidebar" | "banner" | "minimal" | "split" | "timeline" | "ats" | "chronicle";
 
 export type ExperienceItem = { role: string; company: string; period: string; details: string };
 export type EducationItem = { degree: string; school: string; period: string };
@@ -148,6 +148,20 @@ export const TEMPLATES: Template[] = [
        { role: "VP Operations", company: "Cloudline", period: "2014 — 2019", details: "Built customer success org that cut churn by 40%." }],
       [{ degree: "MBA", school: "Wharton School", period: "2012 — 2014" }],
       "Scaling operations, P&L ownership, M&A integration, Board relations") },
+  { id: "ats-classic", name: "ATS Classic", industry: "All Industries", role: "Any Role", layout: "ats", accent: "oklch(0.3 0.01 270)", font: "sans", score: 99,
+    sample: p("Ngozi Ekwueme", "Customer Success Manager", "Enugu, Nigeria", "Customer success manager with 5 years of experience reducing churn and growing accounts for SaaS businesses. Skilled at onboarding, renewal management and turning feedback into product improvements.",
+      [{ role: "Customer Success Manager", company: "BrightDesk Software", period: "2021 — Present", details: "Manage a portfolio of 60+ business accounts with a 94% renewal rate.\nCut average onboarding time from 3 weeks to 9 days.\nBuilt a health-score system that flags at-risk accounts 60 days early." },
+       { role: "Support Specialist", company: "QuickReply", period: "2018 — 2021", details: "Resolved 40+ customer tickets daily with a 97% satisfaction score.\nWrote 25 help-centre articles that cut repeat tickets by 18%." }],
+      [{ degree: "B.Sc. Mass Communication", school: "University of Nigeria, Nsukka", period: "2014 — 2018" }],
+      "Account management, Onboarding, Renewals, CRM (HubSpot), Churn analysis, Customer training, Escalation handling, Reporting",
+      { strengths: "Relationship building, Problem solving, Clear written communication", courses: "Certified Customer Success Manager (CCSM)" }) },
+  { id: "chronicle", name: "Chronicle", industry: "International", role: "Europass Style", layout: "chronicle", accent: "oklch(0.42 0.09 230)", font: "sans", score: 96,
+    sample: p("Emeka Obiora", "Logistics Coordinator", "Onitsha, Nigeria", "Logistics coordinator with 7 years of experience moving goods across West Africa. Reliable, detail-focused and calm under pressure.",
+      [{ role: "Logistics Coordinator", company: "TransGate Haulage, Onitsha", period: "02/2023 — Present", details: "Coordinate 25+ weekly deliveries across 6 states.\nReduced fuel costs by 12% through route planning.\nTrack a fleet of 18 vehicles using GPS software." },
+       { role: "Dispatch Officer", company: "SafeMove Express, Awka", period: "06/2019 — 01/2023", details: "Scheduled daily dispatches for 30 riders.\nMaintained 98% on-time delivery record." }],
+      [{ degree: "HND Business Administration", school: "Federal Polytechnic, Oko", period: "09/2014 — 07/2016" }, { degree: "SSCE", school: "Community Secondary School, Nnewi", period: "2008 — 2014" }],
+      "Route planning, Fleet tracking, Inventory, Excel, Negotiation, Reporting",
+      { strengths: "Time management, Team coordination, Accuracy", awards: "Employee of the Year 2022 — SafeMove Express", courses: "Diploma in Supply Chain Management — Alison (alison.com)", languages: "English — Fluent · Igbo — Native · Hausa — Basic", projects: "Weekend volunteer driver for community food bank" }) },
 ];
 
 export const INDUSTRIES = ["All", ...Array.from(new Set(TEMPLATES.map((t) => t.industry)))];
