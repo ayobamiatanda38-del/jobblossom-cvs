@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { ArrowLeft, Copy, PenLine, Sparkles, Square } from "lucide-react";
+import { Download, ArrowLeft, Copy, PenLine, Sparkles, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site-header";
+import { ResumeUpload } from "@/components/resume-upload";
+import { downloadTextPdf } from "@/lib/doc-files";
 
 export const Route = createFileRoute("/cover-letter-drafter")({
   head: () => ({ meta: [
@@ -50,7 +52,7 @@ function Drafter() {
     <p className="mt-3 max-w-2xl text-muted-foreground">Get a tailored cover letter built only from experience you actually have. Nothing is invented — gaps are handled honestly.</p>
     <div className="mt-9 grid gap-5 md:grid-cols-2">
       <div><Label htmlFor="job">Job description</Label><Textarea id="job" className="mt-2 min-h-72 bg-paper" placeholder="Paste the job posting here…" value={job} onChange={e => setJob(e.target.value)} /></div>
-      <div><Label htmlFor="resume">Your resume</Label><Textarea id="resume" className="mt-2 min-h-72 bg-paper" placeholder="Paste the text of your CV here…" value={resume} onChange={e => setResume(e.target.value)} /></div>
+      <div><Label>Your resume</Label><ResumeUpload onText={setResume} /></div>
     </div>
     <div className="mt-5 flex flex-wrap items-center gap-3">
       <div className="flex gap-2" role="group" aria-label="Tone">
@@ -58,9 +60,9 @@ function Drafter() {
       </div>
       {busy ? <Button variant="outline" onClick={() => ctrl.current?.abort()}><Square />Stop</Button>
         : <Button disabled={!ready} onClick={run}><Sparkles />Draft my cover letter</Button>}
-      {out && !busy && <Button variant="ghost" onClick={() => navigator.clipboard.writeText(out)}><Copy />Copy letter</Button>}
+      {out && !busy && <><Button variant="ink" onClick={() => downloadTextPdf("", out.split(/\n-{3,}\n/)[0]!, "jobprimed-cover-letter.pdf")}><Download />Download PDF</Button><Button variant="ghost" onClick={() => navigator.clipboard.writeText(out)}><Copy />Copy letter</Button></>}
     </div>
-    {!ready && <p className="mt-2 text-xs text-muted-foreground">Paste a few lines in both boxes to begin.</p>}
+    {!ready && <p className="mt-2 text-xs text-muted-foreground">Upload your resume and paste the job description to begin.</p>}
     {err && <p role="alert" className="mt-6 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{err}</p>}
     {(busy || out) && <section aria-live="polite" className="mt-8 border-t border-line pt-8">
       {busy && !out && <p className="text-sm text-muted-foreground animate-pulse">Reading the job and your CV…</p>}
