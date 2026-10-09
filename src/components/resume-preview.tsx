@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { Mail, MapPin, Phone, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTemplate, type ResumeData, type Template } from "@/lib/templates";
-import { cvBackground } from "@/lib/cv-design";
 
 export type { ResumeData };
 
@@ -12,7 +11,7 @@ type Props = { data?: ResumeData; template?: Template | string; className?: stri
 export function ResumePreview({ data, template, className, accent }: Props) {
   const t = typeof template === "object" ? template : getTemplate(template);
   const d = data ?? t.sample;
-  const style = { "--cv": cvBackground(accent ?? t.accent) } as CSSProperties;
+  const style = { "--cv": accent ?? t.accent } as CSSProperties;
   const font = t.font === "serif" ? "font-display" : "font-sans";
 
   const Contact = ({ light }: { light?: boolean | undefined }) => (
@@ -50,9 +49,9 @@ export function ResumePreview({ data, template, className, accent }: Props) {
   </div>;
 
   return (
-    <article data-layout={t.layout} style={style} className={cn("cv-root min-h-[141.4cqw] w-full bg-paper text-ink paper-shadow", font, className)}>
+    <article style={style} className={cn("cv-root aspect-[1/1.414] w-full overflow-hidden bg-paper text-ink paper-shadow", font, className)}>
       {t.layout === "sidebar" && <div className="grid h-full grid-cols-[36%_64%]">
-        <aside className="cv-bg h-full space-y-4 p-5 text-ink">
+        <aside className="cv-bg h-full space-y-4 p-5 text-paper [&_.cv-accent]:text-paper">
           <div className="grid size-14 place-items-center rounded-full bg-paper/20 text-lg font-bold">{initials(d.name)}</div>
           <div><h1 className="text-lg font-bold leading-tight">{d.name}</h1><p className="text-[10px] opacity-90">{d.title}</p></div>
           <div className="cv-small space-y-1 opacity-90"><p>{d.email}</p><p>{d.phone}</p><p>{d.location}</p><p>{d.website}</p></div>
@@ -62,8 +61,8 @@ export function ResumePreview({ data, template, className, accent }: Props) {
       </div>}
 
       {t.layout === "banner" && <div>
-        <header className="cv-bg px-6 py-5 text-ink"><h1 className="text-2xl font-bold">{d.name}</h1><p className="text-[11px] opacity-90">{d.title}</p><div className="mt-2"><Contact light /></div></header>
-        <div className="grid grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)] gap-5 p-6"><Main /><Side /></div>
+        <header className="cv-bg px-6 py-5 text-paper"><h1 className="text-2xl font-bold">{d.name}</h1><p className="text-[11px] opacity-90">{d.title}</p><div className="mt-2"><Contact light /></div></header>
+        <div className="grid grid-cols-[62%_38%] gap-5 p-6"><Main /><Side /></div>
       </div>}
 
       {t.layout === "split" && <div className="grid h-full grid-cols-[62%_38%]">
@@ -77,13 +76,13 @@ export function ResumePreview({ data, template, className, accent }: Props) {
           <p className="mt-1 text-[11px] cv-accent">{d.title}</p>
           <div className={cn("mt-2", t.layout === "minimal" && "flex justify-center")}><Contact /></div>
         </header>
-        <div className="grid grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)] gap-5"><Main /><Side /></div>
+        <div className="grid grid-cols-[64%_36%] gap-5"><Main /><Side /></div>
       </div>}
 
       {t.layout === "ats" && <div className="p-7">
         <header>
           <h1>{d.name}</h1>
-          <p className="cv-small mt-1 text-muted-foreground">{[d.title, d.location, d.phone, d.email, d.website].filter(Boolean).join(" | ")}</p>
+          <p className="cv-small mt-1 text-muted-foreground">{[d.location, d.phone, d.email].filter(Boolean).join(" | ")}</p>
         </header>
         <div className="mt-2 space-y-4 [&_h3]:border-b [&_h3]:border-ink/60 [&_h3]:pb-0.5 [&_h3]:text-ink">
           <Text label="Professional Summary" value={d.summary} />
@@ -97,9 +96,6 @@ export function ResumePreview({ data, template, className, accent }: Props) {
           {d.projects && <Text label="Key Achievements" value={d.projects} />}
           <Education />
           {d.courses && <Text label="Certifications" value={d.courses} />}
-          <Text label="Strengths" value={d.strengths} />
-          <Text label="Languages" value={d.languages} />
-          <Text label="Awards" value={d.awards} />
           {d.references && <Text label="References" value={d.references} />}
         </div>
       </div>}
@@ -107,19 +103,19 @@ export function ResumePreview({ data, template, className, accent }: Props) {
       {t.layout === "chronicle" && <div className="p-6 text-[0.92em]">
         <header className="border-b-2 cv-border pb-2">
           <h1>{d.name}</h1>
-          <p className="cv-small mt-1 text-muted-foreground">{[d.title, d.location, d.phone, d.email, d.website].filter(Boolean).join(" · ")}</p>
+          <p className="cv-small mt-1 text-muted-foreground">{[d.title, d.location, d.phone, d.email].filter(Boolean).join(" · ")}</p>
         </header>
         <div className="mt-3 space-y-4">
           {d.summary && <section><H>Profile</H><p className="cv-para">{d.summary.split(/\n+/).filter(Boolean).map((l, i) => <span key={i}>{l}</span>)}</p></section>}
           {d.experience.length > 0 && <section><H>Work Experience</H><div className="space-y-3">{d.experience.map((e, i) => (
-            <div key={i} className="space-y-1">
-              <p className="cv-small font-semibold cv-accent">{e.period}</p>
+            <div key={i} className="grid grid-cols-[24%_76%] gap-3">
+              <p className="cv-small whitespace-nowrap font-semibold cv-accent">{e.period}</p>
               <div><p className="cv-role">{e.role}</p><p className="cv-small text-muted-foreground">{e.company}</p>
                 <ul className="mt-1 list-disc space-y-0.5">{e.details.split("\n").filter(Boolean).map((l, j) => <li key={j}>{l}</li>)}</ul></div>
             </div>))}</div></section>}
           {d.education.length > 0 && <section><H>Education</H><div className="space-y-2">{d.education.map((e, i) => (
-            <div key={i} className="space-y-1">
-              <p className="cv-small font-semibold cv-accent">{e.period}</p>
+            <div key={i} className="grid grid-cols-[24%_76%] gap-3">
+              <p className="cv-small whitespace-nowrap font-semibold cv-accent">{e.period}</p>
               <div><p className="cv-role">{e.degree}</p><p className="cv-small text-muted-foreground">{e.school}</p></div>
             </div>))}</div></section>}
           {d.skills && <section><H>Skills</H><p>{d.skills.split(",").map((s) => s.trim()).filter(Boolean).join(", ")}</p></section>}

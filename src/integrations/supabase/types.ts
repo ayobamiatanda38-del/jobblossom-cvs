@@ -14,33 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      cv_entitlements: {
-        Row: {
-          created_at: string
-          expires_at: string
-          id: string
-          plan: string
-          reference: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          expires_at: string
-          id?: string
-          plan: string
-          reference: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string
-          id?: string
-          plan?: string
-          reference?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       marketing_preferences: {
         Row: {
           consented_at: string | null
