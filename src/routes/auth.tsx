@@ -14,7 +14,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ mode: z.enum(["signin", "signup"]).optional() }),
   head: () => ({ meta: [
     { title: "Log in or sign up — JobPrimed" },
-    { name: "description", content: "Sign in to JobPrimed to save your CVs and unlock Pro templates." },
+    { name: "description", content: "Sign in to JobPrimed to save your resumes and unlock Pro templates." },
     { property: "og:title", content: "Log in or sign up — JobPrimed" },
     { property: "og:description", content: "Access your JobPrimed account." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
@@ -30,6 +30,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [newsletter, setNewsletter] = useState(false);
+  const [left, setLeft] = useState(0);
+  useEffect(() => { if (left <= 0) return; const t = setTimeout(() => setLeft(left - 1), 1000); return () => clearTimeout(t); }, [left]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const { user } = useSession();
   const navigate = useNavigate();
@@ -46,8 +48,12 @@ function AuthPage() {
     if (!canProceed) { setMsg({ ok: false, text: "Please tick both boxes below before continuing." }); return; }
     setBusy(true); setMsg(null); remember();
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth?mode=signin` } });
-      setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "We've sent a verification link to your email. Click it, then come back here to log in." });
+      if (left > 0) { setBusy(false); return; }
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth?mode=signin` } });
+      const exists = (error && /already|registered|exists/i.test(error.message)) || (!error && data.user && (data.user.identities?.length ?? 0) === 0);
+      if (exists) { setMsg({ ok: false, text: "This email is already registered. Please log in instead." }); setMode("signin"); }
+      else if (error) setMsg({ ok: false, text: error.message });
+      else { setMsg({ ok: true, text: "We've sent an activation link to your email. Click it, then come back here to log in." }); setLeft(59); }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setMsg({ ok: false, text: error.message });
@@ -75,7 +81,7 @@ function AuthPage() {
     <div className="w-full max-w-md border border-line bg-paper p-8 soft-shadow">
       <Link to="/" className="flex items-center gap-2 font-bold"><span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground"><FileText className="size-4" /></span>JobPrimed</Link>
       <h1 className="mt-6 font-display text-4xl">{mode === "signup" ? "Create your account" : "Welcome back"}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{mode === "signup" ? "Save your CVs and pick up anywhere." : "Log in to continue building."}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{mode === "signup" ? "Save your resumes and pick up anywhere." : "Log in to continue building."}</p>
 
       <div className="mt-6 space-y-2.5">
         <label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 accent-primary" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <span>I agree to the <Link to="/terms" className="text-primary underline">terms and conditions</Link> and acknowledge the <Link to="/privacy" className="text-primary underline">privacy notice</Link>.</span></label>
@@ -88,7 +94,8 @@ function AuthPage() {
         <div><Label htmlFor="email">Email</Label><Input id="email" type="email" required className="mt-2" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
         <div><Label htmlFor="pw">Password</Label><Input id="pw" type="password" required minLength={6} className="mt-2" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
         {msg && <p className={`text-sm ${msg.ok ? "text-mint-strong" : "text-destructive"}`}>{msg.text}</p>}
-        <Button type="submit" variant="hero" className="w-full" disabled={busy || !canProceed}>{busy ? "Please wait…" : mode === "signup" ? "Sign up" : "Log in"}</Button>
+        {mode === "signup" && left > 0 && <p className="text-sm font-semibold text-mint-strong" aria-live="polite">Activate your account within the next {left} second{left === 1 ? "" : "s"}. You can request a new link when the timer ends.</p>}
+        <Button type="submit" variant="hero" className="w-full" disabled={busy || !canProceed || (mode === "signup" && left > 0)}>{busy ? "Please wait…" : mode === "signup" ? (left > 0 ? `Resend link in ${left}s` : "Sign up") : "Log in"}</Button>
       </form>
       {!canProceed && <p className="mt-3 text-center text-xs text-muted-foreground">Tick both boxes above to continue.</p>}
       <p className="mt-5 text-center text-sm text-muted-foreground">{mode === "signup" ? "Already have an account?" : "New to JobPrimed?"}{" "}

@@ -20,6 +20,8 @@ export type ResumeData = {
   courses: string;
   awards: string;
   references: string;
+  photo?: string;
+  showPhoto?: boolean;
 };
 
 export type Template = {
@@ -65,7 +67,7 @@ const p = (
 export const TEMPLATES: Template[] = [
   { id: "prime", name: "Prime", industry: "Marketing", role: "Product Marketing Manager", layout: "classic", accent: "oklch(0.62 0.2 31)", font: "sans", score: 95,
     sample: p("Amara Okafor", "Product Marketing Manager", "Lagos, Nigeria", "Strategic product marketer with 7+ years turning customer insight into campaigns that drive adoption and sustainable growth.",
-      [{ role: "Senior Product Marketing Manager", company: "CloudNine Africa", period: "2021 — Present", details: "Led go-to-market across three markets, lifting qualified pipeline by 38%.\nBuilt a customer research programme that shaped two product launches." },
+      [{ role: "Senior Product Marketing Manager", company: "CloudNine Africa", period: "2021 — Present", details: "Led go-to-market across three markets, lifting qualified pipeline by 38%.\nBuilt a customer research program that shaped two product launches." },
        { role: "Marketing Associate", company: "Paystream", period: "2018 — 2021", details: "Grew email revenue 2.4× through lifecycle segmentation." }],
       [{ degree: "B.Sc. Business Administration", school: "University of Lagos", period: "2014 — 2018" }],
       "Go-to-market, Customer research, Analytics, Positioning, HubSpot", { languages: "English — Native · French — Conversational", courses: "Google Analytics Certification" }) },
@@ -87,7 +89,7 @@ export const TEMPLATES: Template[] = [
       [{ degree: "M.Sc. Finance", school: "London School of Economics", period: "2019 — 2020" }, { degree: "B.Sc. Economics", school: "Obafemi Awolowo University", period: "2014 — 2018" }],
       "Financial modelling, Valuation, Excel/VBA, Power BI, SQL", { courses: "CFA Level II Candidate" }) },
   { id: "canvas", name: "Canvas", industry: "Design", role: "Product Designer", layout: "split", accent: "oklch(0.6 0.18 330)", font: "sans", pro: true, score: 91,
-    sample: p("Maya Chen", "Product Designer", "Toronto, Canada", "Product designer crafting accessible, joyful interfaces for fintech and health. I pair research rigour with visual polish.",
+    sample: p("Maya Chen", "Product Designer", "Toronto, Canada", "Product designer crafting accessible, joyful interfaces for fintech and health. I pair research rigor with visual polish.",
       [{ role: "Senior Product Designer", company: "Wealthly", period: "2020 — Present", details: "Redesigned onboarding, lifting activation 22%.\nBuilt the design system used by 40 engineers." },
        { role: "UI Designer", company: "Studio North", period: "2017 — 2020", details: "Shipped 20+ client apps across mobile and web." }],
       [{ degree: "BDes Interaction Design", school: "OCAD University", period: "2013 — 2017" }],
@@ -119,7 +121,7 @@ export const TEMPLATES: Template[] = [
       "Menu development, Kitchen leadership, Food costing, HACCP") },
   { id: "fresh", name: "Fresh Start", industry: "Students", role: "Graduate / Intern", layout: "classic", accent: "oklch(0.6 0.15 200)", font: "sans", score: 92,
     sample: p("Zainab Bello", "Economics Graduate", "Kano, Nigeria", "First-class economics graduate eager to apply data skills and fresh thinking in a fast-paced analyst role.",
-      [{ role: "Research Intern", company: "Central Bank of Nigeria", period: "Summer 2024", details: "Cleaned and analysed 10 years of inflation data in Stata.\nPresented findings to the monetary policy research team." }],
+      [{ role: "Research Intern", company: "Central Bank of Nigeria", period: "Summer 2024", details: "Cleaned and analyzed 10 years of inflation data in Stata.\nPresented findings to the monetary policy research team." }],
       [{ degree: "B.Sc. Economics (First Class)", school: "Bayero University", period: "2020 — 2024" }],
       "Stata, Excel, Python basics, Report writing, Public speaking", { awards: "Best Graduating Student, Faculty of Social Sciences" }) },
   { id: "route", name: "Route", industry: "Logistics", role: "Operations Manager", layout: "sidebar", accent: "oklch(0.5 0.1 230)", font: "sans", score: 91,
@@ -151,7 +153,7 @@ export const TEMPLATES: Template[] = [
   { id: "ats-classic", name: "ATS Classic", industry: "All Industries", role: "Any Role", layout: "ats", accent: "oklch(0.3 0.01 270)", font: "sans", score: 99,
     sample: p("Ngozi Ekwueme", "Customer Success Manager", "Enugu, Nigeria", "Customer success manager with 5 years of experience reducing churn and growing accounts for SaaS businesses. Skilled at onboarding, renewal management and turning feedback into product improvements.",
       [{ role: "Customer Success Manager", company: "BrightDesk Software", period: "2021 — Present", details: "Manage a portfolio of 60+ business accounts with a 94% renewal rate.\nCut average onboarding time from 3 weeks to 9 days.\nBuilt a health-score system that flags at-risk accounts 60 days early." },
-       { role: "Support Specialist", company: "QuickReply", period: "2018 — 2021", details: "Resolved 40+ customer tickets daily with a 97% satisfaction score.\nWrote 25 help-centre articles that cut repeat tickets by 18%." }],
+       { role: "Support Specialist", company: "QuickReply", period: "2018 — 2021", details: "Resolved 40+ customer tickets daily with a 97% satisfaction score.\nWrote 25 help-center articles that cut repeat tickets by 18%." }],
       [{ degree: "B.Sc. Mass Communication", school: "University of Nigeria, Nsukka", period: "2014 — 2018" }],
       "Account management, Onboarding, Renewals, CRM (HubSpot), Churn analysis, Customer training, Escalation handling, Reporting",
       { strengths: "Relationship building, Problem solving, Clear written communication", courses: "Certified Customer Success Manager (CCSM)" }) },

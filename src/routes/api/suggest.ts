@@ -8,7 +8,7 @@ const Body = z.object({
   context: z.string().max(300).optional(),
 });
 
-const SYSTEM = `You are JobPrimed's CV writing assistant. Write ready-to-use CV content for ONE section, based on the candidate's job title.
+const SYSTEM = `You are JobPrimed's resume writing assistant. Write ready-to-use resume content for ONE section, based on the candidate's job title.
 Rules:
 - Output only the section content in plain text. No headings, no Markdown, no quotes, no preamble.
 - Never invent employers, dates, degrees or exact numbers. Use [X%] or [number] placeholders where a metric belongs.
