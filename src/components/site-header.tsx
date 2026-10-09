@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 
-const nav = [["CV tools", "tools"], ["Examples", "examples"], ["How it works", "how"], ["Pricing", "pricing"], ["FAQ", "faq"]] as const;
+const nav = [["Resume tools", "tools"], ["Examples", "examples"], ["How it works", "how"], ["Pricing", "pricing"], ["FAQ", "faq"]] as const;
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -28,11 +28,12 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex">
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} className="hover:text-ink">{l}</Link>)}
           <Link to="/resume-tailor" className="hover:text-ink">Resume tailor</Link>
+          <Link to="/jobs" className="hover:text-ink">Jobs</Link>
           <Link to="/cover-letter-drafter" className="hover:text-ink">Cover letter AI</Link>
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
           <AuthButtons />
-          <Button variant="hero" asChild><Link to="/builder">Create my CV</Link></Button>
+          <Button variant="hero" asChild><Link to="/builder">Create my resume</Link></Button>
         </div>
         <Button variant="ghost" size="icon" aria-label="Toggle menu" className="lg:hidden" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
       </div>
@@ -40,9 +41,10 @@ export function SiteHeader() {
         <div className="flex flex-col gap-2 text-sm font-medium">
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} onClick={() => setOpen(false)} className="py-2">{l}</Link>)}
           <Link to="/resume-tailor" onClick={() => setOpen(false)} className="py-2">Resume tailor</Link>
+          <Link to="/jobs" onClick={() => setOpen(false)} className="py-2">Jobs</Link>
           <Link to="/cover-letter-drafter" onClick={() => setOpen(false)} className="py-2">Cover letter AI</Link>
           <AuthButtons mobile />
-          <Button asChild><Link to="/builder">Create my CV</Link></Button>
+          <Button asChild><Link to="/builder">Create my resume</Link></Button>
         </div>
       </nav>}
     </header>

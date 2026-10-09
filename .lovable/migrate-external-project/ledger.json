@@ -1,0 +1,9 @@
+[
+ {"capability":"code (routes, components, templates, PDF export)","source":"github ayobamiatanda38-del/jobblossom-cvs","outcome":"migrate","status":"done","next_action":"none"},
+ {"capability":"schema: marketing_preferences + RLS","source":"supabase/migrations","outcome":"migrate","status":"done","next_action":"none"},
+ {"capability":"records","source":"old backend","outcome":"migrate","status":"pending","next_action":"Export marketing_preferences and users (email, original id) from old backend if existing users matter"},
+ {"capability":"auth (email + Google)","source":"old backend","outcome":"migrate","status":"implemented-unverified","next_action":"Verify sign-up and Google sign-in in preview"},
+ {"capability":"AI routes (cover letter, suggest, tailor)","source":"LOVABLE_API_KEY gateway","outcome":"preserve","status":"implemented-unverified","next_action":"Try the AI tools in preview"},
+ {"capability":"Paystack payments","source":"PAYSTACK_SECRET_KEY","outcome":"preserve","status":"pending","next_action":"Add PAYSTACK_SECRET_KEY securely when ready for live checkout"},
+ {"capability":"committed .env in repo","source":"repo","outcome":"excluded","status":"pending","next_action":"Rotate any keys that were in it"}
+]

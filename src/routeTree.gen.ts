@@ -15,9 +15,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as CoverLetterDrafterRouteImport } from './routes/cover-letter-drafter'
 import { Route as CoverLettersRouteImport } from './routes/cover-letters'
+import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResignationLettersRouteImport } from './routes/resignation-letters'
 import { Route as ResumeTailorRouteImport } from './routes/resume-tailor'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCoverLetterRouteImport } from './routes/api/cover-letter'
 import { Route as ApiSuggestRouteImport } from './routes/api/suggest'
@@ -53,6 +55,11 @@ const CoverLettersRoute = CoverLettersRouteImport.update({
   path: '/cover-letters',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -66,6 +73,11 @@ const ResignationLettersRoute = ResignationLettersRouteImport.update({
 const ResumeTailorRoute = ResumeTailorRouteImport.update({
   id: '/resume-tailor',
   path: '/resume-tailor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -96,9 +108,11 @@ export interface FileRoutesByFullPath {
   '/builder': typeof BuilderRoute
   '/cover-letter-drafter': typeof CoverLetterDrafterRoute
   '/cover-letters': typeof CoverLettersRoute
+  '/jobs': typeof JobsRoute
   '/privacy': typeof PrivacyRoute
   '/resignation-letters': typeof ResignationLettersRoute
   '/resume-tailor': typeof ResumeTailorRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
   '/api/suggest': typeof ApiSuggestRoute
@@ -111,9 +125,11 @@ export interface FileRoutesByTo {
   '/builder': typeof BuilderRoute
   '/cover-letter-drafter': typeof CoverLetterDrafterRoute
   '/cover-letters': typeof CoverLettersRoute
+  '/jobs': typeof JobsRoute
   '/privacy': typeof PrivacyRoute
   '/resignation-letters': typeof ResignationLettersRoute
   '/resume-tailor': typeof ResumeTailorRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
   '/api/suggest': typeof ApiSuggestRoute
@@ -127,9 +143,11 @@ export interface FileRoutesById {
   '/builder': typeof BuilderRoute
   '/cover-letter-drafter': typeof CoverLetterDrafterRoute
   '/cover-letters': typeof CoverLettersRoute
+  '/jobs': typeof JobsRoute
   '/privacy': typeof PrivacyRoute
   '/resignation-letters': typeof ResignationLettersRoute
   '/resume-tailor': typeof ResumeTailorRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/api/cover-letter': typeof ApiCoverLetterRoute
   '/api/suggest': typeof ApiSuggestRoute
@@ -144,9 +162,11 @@ export interface FileRouteTypes {
     | '/builder'
     | '/cover-letter-drafter'
     | '/cover-letters'
+    | '/jobs'
     | '/privacy'
     | '/resignation-letters'
     | '/resume-tailor'
+    | '/templates'
     | '/terms'
     | '/api/cover-letter'
     | '/api/suggest'
@@ -159,9 +179,11 @@ export interface FileRouteTypes {
     | '/builder'
     | '/cover-letter-drafter'
     | '/cover-letters'
+    | '/jobs'
     | '/privacy'
     | '/resignation-letters'
     | '/resume-tailor'
+    | '/templates'
     | '/terms'
     | '/api/cover-letter'
     | '/api/suggest'
@@ -174,9 +196,11 @@ export interface FileRouteTypes {
     | '/builder'
     | '/cover-letter-drafter'
     | '/cover-letters'
+    | '/jobs'
     | '/privacy'
     | '/resignation-letters'
     | '/resume-tailor'
+    | '/templates'
     | '/terms'
     | '/api/cover-letter'
     | '/api/suggest'
@@ -190,9 +214,11 @@ export interface RootRouteChildren {
   BuilderRoute: typeof BuilderRoute
   CoverLetterDrafterRoute: typeof CoverLetterDrafterRoute
   CoverLettersRoute: typeof CoverLettersRoute
+  JobsRoute: typeof JobsRoute
   PrivacyRoute: typeof PrivacyRoute
   ResignationLettersRoute: typeof ResignationLettersRoute
   ResumeTailorRoute: typeof ResumeTailorRoute
+  TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
   ApiCoverLetterRoute: typeof ApiCoverLetterRoute
   ApiSuggestRoute: typeof ApiSuggestRoute
@@ -243,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoverLettersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -262,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/resume-tailor'
       fullPath: '/resume-tailor'
       preLoaderRoute: typeof ResumeTailorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -302,9 +342,11 @@ const rootRouteChildren: RootRouteChildren = {
   BuilderRoute: BuilderRoute,
   CoverLetterDrafterRoute: CoverLetterDrafterRoute,
   CoverLettersRoute: CoverLettersRoute,
+  JobsRoute: JobsRoute,
   PrivacyRoute: PrivacyRoute,
   ResignationLettersRoute: ResignationLettersRoute,
   ResumeTailorRoute: ResumeTailorRoute,
+  TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
   ApiCoverLetterRoute: ApiCoverLetterRoute,
   ApiSuggestRoute: ApiSuggestRoute,

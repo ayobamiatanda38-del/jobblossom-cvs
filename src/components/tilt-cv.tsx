@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { ResumePreview } from "@/components/resume-preview";
 import { getTemplate } from "@/lib/templates";
 
-/** Interactive 3D CV stack: cursor-driven tilt, glare, and layered floating parts. */
+/** Interactive 3D resume stack: cursor-driven tilt, glare, and layered floating parts. */
 export function TiltCV() {
   const ref = useRef<HTMLDivElement>(null);
   const [r, setR] = useState({ x: -6, y: 12, gx: 50, gy: 30 });

@@ -3,10 +3,10 @@ import { z } from "zod";
 
 const Body = z.object({ resume: z.string().trim().min(50).max(20000), job: z.string().trim().min(50).max(15000) });
 
-const SYSTEM = `You are a careful CV editor for JobPrimed. Suggest edits that make the candidate's resume more relevant to the job description.
+const SYSTEM = `You are a careful resume editor for JobPrimed. Suggest edits that make the candidate's resume more relevant to the job description.
 Strict rules:
 - NEVER invent experience, employers, titles, dates, degrees, certifications, metrics or skills that are not in the resume.
-- Only rephrase, reorder, emphasise, or surface what the resume already supports. Use the job's wording where it truthfully matches.
+- Only rephrase, reorder, emphasize, or surface what the resume already supports. Use the job's wording where it truthfully matches.
 - If a job requirement is not supported by the resume, list it under "Gaps to address honestly" and suggest how the candidate could address it truthfully (e.g. only if they genuinely have it). Never write it into the resume.
 - Use [add number if true] placeholders instead of making up metrics.
 Format in plain Markdown with these sections:
