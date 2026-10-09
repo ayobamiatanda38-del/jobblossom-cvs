@@ -1,9 +1,54 @@
-[
- {"capability":"code (routes, components, templates, PDF export)","source":"github ayobamiatanda38-del/jobblossom-cvs","outcome":"migrate","status":"done","next_action":"none"},
- {"capability":"schema: marketing_preferences + RLS","source":"supabase/migrations","outcome":"migrate","status":"done","next_action":"none"},
- {"capability":"records","source":"old backend","outcome":"migrate","status":"pending","next_action":"Export marketing_preferences and users (email, original id) from old backend if existing users matter"},
- {"capability":"auth (email + Google)","source":"old backend","outcome":"migrate","status":"implemented-unverified","next_action":"Verify sign-up and Google sign-in in preview"},
- {"capability":"AI routes (cover letter, suggest, tailor)","source":"LOVABLE_API_KEY gateway","outcome":"preserve","status":"implemented-unverified","next_action":"Try the AI tools in preview"},
- {"capability":"Paystack payments","source":"PAYSTACK_SECRET_KEY","outcome":"preserve","status":"pending","next_action":"Add PAYSTACK_SECRET_KEY securely when ready for live checkout"},
- {"capability":"committed .env in repo","source":"repo","outcome":"excluded","status":"pending","next_action":"Rotate any keys that were in it"}
-]
+{
+  "source": "github:ayobamiatanda38-del/jobblossom-cvs",
+  "capabilities": [
+    {
+      "capability": "application code (TanStack Start, same stack)",
+      "source": "repo src/",
+      "outcome": "copy into project",
+      "status": "done",
+      "next_action": ""
+    },
+    {
+      "capability": "schema: marketing_preferences table",
+      "source": "supabase/migrations/20261002001739",
+      "outcome": "migrate",
+      "status": "done",
+      "next_action": ""
+    },
+    {
+      "capability": "auth (email + Google via Lovable Cloud auth)",
+      "source": "src/integrations/supabase, @lovable.dev/cloud-auth-js",
+      "outcome": "migrate",
+      "status": "done",
+      "next_action": "email + Google sign-in enabled on Lovable Cloud"
+    },
+    {
+      "capability": "records",
+      "source": "none exported",
+      "outcome": "pending",
+      "status": "pending",
+      "next_action": "request CSV/JSON exports of application tables and users after preview"
+    },
+    {
+      "capability": "AI routes (/api/suggest, /api/tailor, /api/cover-letter)",
+      "source": "src/routes/api, src/lib/ai",
+      "outcome": "preserve",
+      "status": "pending",
+      "next_action": "verify; uses Lovable AI Gateway or OPENAI_API_KEY fallback"
+    },
+    {
+      "capability": "payments (USD display, NGN charge)",
+      "source": "src/lib/payments.functions.ts",
+      "outcome": "preserve",
+      "status": "pending",
+      "next_action": "verify; live charging needs Nigerian payment provider key (not in repo)"
+    },
+    {
+      "capability": "secrets (.env in repo)",
+      "source": ".env",
+      "outcome": "excluded",
+      "status": "done",
+      "next_action": "never copied; request needed values via secure secret form at verification time"
+    }
+  ]
+}

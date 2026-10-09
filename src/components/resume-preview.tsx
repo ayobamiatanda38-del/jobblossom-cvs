@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Mail, MapPin, Phone, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTemplate, type ResumeData, type Template } from "@/lib/templates";
@@ -7,25 +7,12 @@ export type { ResumeData };
 
 type Props = { data?: ResumeData; template?: Template | string; className?: string; accent?: string | undefined };
 
-/** Renders a full, A4-proportioned resume. Accent color is template data applied via CSS var. */
+/** Renders a full, A4-proportioned CV. Accent colour is template data applied via CSS var. */
 export function ResumePreview({ data, template, className, accent }: Props) {
   const t = typeof template === "object" ? template : getTemplate(template);
   const d = data ?? t.sample;
   const style = { "--cv": accent ?? t.accent } as CSSProperties;
   const font = t.font === "serif" ? "font-display" : "font-sans";
-  const root = useRef<HTMLElement>(null); const inner = useRef<HTMLDivElement>(null);
-  // Shrink-to-fit: keep every letter inside the A4 page instead of clipping it.
-  useLayoutEffect(() => {
-    const r = root.current, el = inner.current; if (!r || !el) return;
-    const fit = () => {
-      const H = r.clientHeight; if (!H) return;
-      el.style.zoom = "1"; el.style.height = "auto";
-      const natural = el.scrollHeight;
-      const z = natural > H ? Math.max(0.3, H / natural) : 1;
-      el.style.zoom = String(z); el.style.height = `${H / z}px`;
-    };
-    fit(); const ro = new ResizeObserver(fit); ro.observe(r); return () => ro.disconnect();
-  });
 
   const Contact = ({ light }: { light?: boolean | undefined }) => (
     <div className={cn("flex flex-wrap gap-x-3 gap-y-1 text-[9px] cv-small", light ? "opacity-90" : "text-muted-foreground")}>
@@ -62,10 +49,10 @@ export function ResumePreview({ data, template, className, accent }: Props) {
   </div>;
 
   return (
-    <article ref={root} style={style} className={cn("cv-root aspect-[1/1.414] w-full overflow-hidden bg-paper text-ink paper-shadow", font, className)}><div ref={inner} className="h-full">
+    <article style={style} className={cn("cv-root aspect-[1/1.414] w-full overflow-hidden bg-paper text-ink paper-shadow", font, className)}>
       {t.layout === "sidebar" && <div className="grid h-full grid-cols-[36%_64%]">
         <aside className="cv-bg h-full space-y-4 p-5 text-paper [&_.cv-accent]:text-paper">
-          {d.showPhoto !== false && (d.photo ? <img src={d.photo} alt="" className="size-14 rounded-full object-cover" /> : <div className="grid size-14 place-items-center rounded-full bg-paper/20 text-lg font-bold">{initials(d.name)}</div>)}
+          <div className="grid size-14 place-items-center rounded-full bg-paper/20 text-lg font-bold">{initials(d.name)}</div>
           <div><h1 className="text-lg font-bold leading-tight">{d.name}</h1><p className="text-[10px] opacity-90">{d.title}</p></div>
           <div className="cv-small space-y-1 opacity-90"><p>{d.email}</p><p>{d.phone}</p><p>{d.location}</p><p>{d.website}</p></div>
           <Side light />
@@ -140,7 +127,7 @@ export function ResumePreview({ data, template, className, accent }: Props) {
           <Text label="References" value={d.references} />
         </div>
       </div>}
-    </div></article>
+    </article>
   );
 }
 

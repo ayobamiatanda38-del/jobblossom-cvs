@@ -13,4 +13,4 @@
 - Model builder monetization as explicit free/Pro capabilities in the `/builder` UI, with payment processing remaining a separate integration, so access states never imply a live charge.
 - CV templates and sample content live as data in `src/lib/templates.ts`, rendered by one `ResumePreview` with six layouts, so new templates need no new components.
 - Prices are defined in USD and converted to NGN via `USD_TO_NGN` at checkout, so display and charge currency stay in one place.
-- Editor drafts autosave to localStorage and PDFs are generated client-side (html2canvas-pro + jspdf) from a hidden A4 render.
+- Editor drafts autosave to localStorage and PDFs are generated client-side (html2canvas-pro + jsPDF) from a hidden A4 render.

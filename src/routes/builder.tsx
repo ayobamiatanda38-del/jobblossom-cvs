@@ -22,10 +22,10 @@ import { getExchangeRate, startCheckout, verifyPayment } from "@/lib/payments.fu
 export const Route = createFileRoute("/builder")({
   validateSearch: z.object({ template: z.string().optional(), checkout: z.boolean().optional(), reference: z.string().optional(), trxref: z.string().optional() }),
   head: () => ({ meta: [
-    { title: "Resume Editor & Templates — JobPrimed" },
-    { name: "description", content: "Fill in, style and download an ATS-ready resume with JobPrimed's guided editor and 16 original templates." },
-    { property: "og:title", content: "Resume Editor & Templates — JobPrimed" },
-    { property: "og:description", content: "Guided resume sections, live preview, autosave and PDF download." },
+    { title: "CV Editor & Templates — JobPrimed" },
+    { name: "description", content: "Fill in, style and download an ATS-ready CV with JobPrimed's guided editor and 16 original templates." },
+    { property: "og:title", content: "CV Editor & Templates — JobPrimed" },
+    { property: "og:description", content: "Guided CV sections, live preview, autosave and PDF download." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
   ]}),
   component: BuilderPage,
@@ -151,7 +151,7 @@ function BuilderPage() {
 
     <div className="cv-editor lg:grid lg:grid-cols-[210px_minmax(400px,500px)_1fr]">
       <nav className="sticky top-16 hidden h-[calc(100vh-64px)] overflow-y-auto border-r border-line bg-paper p-3 lg:block">
-        <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-muted-foreground">Resume sections</p>
+        <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase text-muted-foreground">CV sections</p>
         {SECTIONS.map((s) => <Button key={s.id} variant="ghost" onClick={() => pick(s.id)} className={`h-10 w-full justify-start px-2 ${active === s.id ? "bg-coral-soft text-ink" : "text-muted-foreground"}`}><s.icon /><span className="flex-1 text-left">{s.label}</span>{s.pro && !isPro && <LockKeyhole className="size-3.5" />}</Button>)}
         <button onClick={() => setTemplateOpen(true)} className="mt-4 w-full border border-line p-2 text-left hover:border-ink"><div className="pointer-events-none"><ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} /></div><p className="mt-2 flex items-center justify-between text-xs font-bold">Change template<ChevronRight className="size-3.5" /></p></button>
       </nav>
@@ -201,71 +201,34 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string;
 }) {
   const join = (a: string, b: string, sep: string) => (a.trim() ? `${a.trim()}${sep}${b}` : b);
-  const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><FormatBar value={cur} on={(v) => up(k, v as never)} /><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
+  const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
   switch (active) {
     case "personal": return <div className="grid gap-4 sm:grid-cols-2">
       <F label="Full name" v={data.name} on={(v) => up("name", v)} /><F label="Job title" v={data.title} on={(v) => up("title", v)} />
       <F label="Email" v={data.email} on={(v) => up("email", v)} /><F label="Phone" v={data.phone} on={(v) => up("phone", v)} />
       <F label="City, Country" v={data.location} on={(v) => up("location", v)} /><F label="Website / LinkedIn" v={data.website} on={(v) => up("website", v)} />
-      <div className="flex flex-wrap items-center gap-3 border border-line bg-paper p-3 sm:col-span-2">
-        {data.photo ? <img src={data.photo} alt="Your photo" className="size-12 rounded-full object-cover" /> : <span className="grid size-12 place-items-center rounded-full bg-muted text-xs text-muted-foreground">Photo</span>}
-        <label className="cursor-pointer text-sm font-semibold text-primary underline">{data.photo ? "Change photo" : "Upload photo"}<input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => { up("photo", String(r.result)); up("showPhoto", true); }; r.readAsDataURL(f); }} /></label>
-        <label className="ml-auto flex items-center gap-2 text-sm"><input type="checkbox" className="size-4 accent-primary" checked={data.showPhoto !== false} onChange={(e) => up("showPhoto", e.target.checked)} />Show photo circle on resume</label>
-      </div>
     </div>;
     case "profile": return <div>{text("summary", "Professional summary")}<p className="mt-1 text-right text-xs text-muted-foreground">{data.summary.length} characters</p></div>;
     case "experience": return <List items={data.experience} onChange={(v) => up("experience", v)} blank={{ role: "", company: "", period: "", details: "" }} title={(e) => e.role || "New position"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><DateRange v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><FormatBar value={e.details} on={(v) => set({ ...e, details: v })} /><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
     case "education": return <List items={data.education} onChange={(v) => up("education", v)} blank={{ degree: "", school: "", period: "" }} title={(e) => e.degree || "New qualification"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><DateRange v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
+      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
     case "skills": return text("skills", "Skills", "Separate with commas — each becomes a tag.");
     case "projects": return text("projects", "Projects");
     case "languages": return text("languages", "Languages", "e.g. English — Native · French — Conversational");
     case "references": return text("references", "References");
     case "strengths": return text("strengths", "Strengths");
     case "courses": return text("courses", "Certifications & courses");
-    case "awards": return text("awards", "Awards & honors");
+    case "awards": return text("awards", "Awards & honours");
     case "design": return <div className="space-y-5">
       <button onClick={openTemplates} className="flex w-full items-center justify-between border border-line bg-paper p-4 text-left hover:border-ink"><span className="flex items-center gap-3"><LayoutTemplate className="text-primary" /><span><b>Template</b><br /><span className="text-sm text-muted-foreground">{templateName}</span></span></span><ChevronRight /></button>
-      <div className="border border-line bg-paper p-4"><p className="font-bold">Accent color</p><div className="mt-3 flex flex-wrap gap-3">{ACCENTS.map((a) => <button key={a.c} title={a.pro && !isPro ? "Pro color" : ""} onClick={() => a.pro && !isPro ? needPro() : setAccent(a.c)} className={`relative grid size-9 place-items-center rounded-full ring-offset-2 ${accent === a.c ? "ring-2 ring-ink" : ""}`} style={{ background: a.c }}>{a.pro && !isPro && <LockKeyhole className="size-3.5 text-paper" />}</button>)}</div></div>
+      <div className="border border-line bg-paper p-4"><p className="font-bold">Accent colour</p><div className="mt-3 flex flex-wrap gap-3">{ACCENTS.map((a) => <button key={a.c} title={a.pro && !isPro ? "Pro colour" : ""} onClick={() => a.pro && !isPro ? needPro() : setAccent(a.c)} className={`relative grid size-9 place-items-center rounded-full ring-offset-2 ${accent === a.c ? "ring-2 ring-ink" : ""}`} style={{ background: a.c }}>{a.pro && !isPro && <LockKeyhole className="size-3.5 text-paper" />}</button>)}</div></div>
     </div>;
   }
 }
 
 const PLACEHOLDERS: Partial<Record<keyof ResumeData, string>> = { summary: "Experienced professional with a record of…", skills: "Project management, Data analysis, Communication", projects: "Describe a project and the impact it made…", languages: "English — Native", references: "Available on request", strengths: "Communication, Leadership", courses: "Certification — Issuer, Year", awards: "Award — Organization, Year" };
 const FIELD_HINTS: Record<string, string> = { "Full name": "Your full name", "Job title": "e.g. Product Designer", "Email": "name@example.com", "Phone": "+234 000 000 0000", "City, Country": "Lagos, Nigeria", "Website / LinkedIn": "linkedin.com/in/yourname", "Dates": "Jan 2022 — Present", "Degree": "B.Sc. Computer Science", "School": "University name", "Employer": "Company name", "Email address": "name@example.com" };
-
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const YEARS = Array.from({ length: 56 }, (_, i) => String(new Date().getFullYear() - i));
-function DateRange({ v, on }: { v: string; on: (v: string) => void }) {
-  const [a = "", b = ""] = v.split(/\s*[—–-]\s*/);
-  const [sm = "", sy = ""] = a.split(" "); const present = /present/i.test(b); const [em = "", ey = ""] = present ? [] : b.split(" ");
-  const emit = (p: { sm?: string; sy?: string; em?: string; ey?: string; present?: boolean }) => {
-    const n = { sm, sy, em, ey, present, ...p };
-    const start = [n.sm, n.sy].filter(Boolean).join(" "); const end = n.present ? "Present" : [n.em, n.ey].filter(Boolean).join(" ");
-    on(start || end ? `${start} — ${end}` : "");
-  };
-  const sel = "h-11 rounded-md border border-input bg-paper px-2 text-sm";
-  return <div><Label>Dates</Label><div className="mt-2 flex flex-wrap items-center gap-2">
-    <select aria-label="Start month" className={sel} value={sm} onChange={(e) => emit({ sm: e.target.value })}><option value="">Month</option>{MONTHS.map((m) => <option key={m}>{m}</option>)}</select>
-    <select aria-label="Start year" className={sel} value={sy} onChange={(e) => emit({ sy: e.target.value })}><option value="">Year</option>{YEARS.map((y) => <option key={y}>{y}</option>)}</select>
-    <span className="text-muted-foreground">to</span>
-    <select aria-label="End month" disabled={present} className={sel} value={em} onChange={(e) => emit({ em: e.target.value })}><option value="">Month</option>{MONTHS.map((m) => <option key={m}>{m}</option>)}</select>
-    <select aria-label="End year" disabled={present} className={sel} value={ey} onChange={(e) => emit({ ey: e.target.value })}><option value="">Year</option>{YEARS.map((y) => <option key={y}>{y}</option>)}</select>
-    <label className="flex items-center gap-1.5 text-sm"><input type="checkbox" className="size-4 accent-primary" checked={present} onChange={(e) => emit({ present: e.target.checked })} />Present</label>
-  </div></div>;
-}
-
-function FormatBar({ value, on }: { value: string; on: (v: string) => void }) {
-  const lines = (f: (l: string, i: number) => string) => on(value.split("\n").map((l) => l.replace(/^(\s*(•|-|\d+\.)\s*)/, "")).map((l, i) => (l.trim() ? f(l, i) : l)).join("\n"));
-  const tools: [string, string, () => void][] = [
-    ["• List", "Bulleted list", () => lines((l) => `• ${l}`)],
-    ["1. List", "Numbered list", () => lines((l, i) => `${i + 1}. ${l}`)],
-    ["Aa", "Capitalize first letters", () => on(value.replace(/(^|[\n.!?]\s*)([a-z])/g, (_, p, c) => p + c.toUpperCase()))],
-    ["Clear", "Remove bullets & extra blank lines", () => on(value.split("\n").map((l) => l.replace(/^(\s*(•|-|\d+\.)\s*)/, "")).join("\n").replace(/\n{3,}/g, "\n\n").trim())],
-  ];
-  return <div role="toolbar" aria-label="Formatting" className="mt-2 flex flex-wrap gap-1 rounded-t-md border border-b-0 border-line bg-muted p-1">{tools.map(([l, t, f]) => <button key={l} type="button" title={t} onClick={f} className="rounded px-2 py-1 text-xs font-semibold hover:bg-paper">{l}</button>)}</div>;
-}
 
 function F({ label, v, on }: { label: string; v: string; on: (v: string) => void }) {
   const id = label.toLowerCase().replace(/\W+/g, "-");
@@ -274,7 +237,6 @@ function F({ label, v, on }: { label: string; v: string; on: (v: string) => void
 
 function List<T>({ items, onChange, blank, title, render }: { items: T[]; onChange: (v: T[]) => void; blank: T; title: (t: T) => string; render: (t: T, set: (t: T) => void) => React.ReactNode }) {
   const [open, setOpen] = useState(0);
-  if (items.length === 0) return <div className="border border-line bg-paper p-3">{render(blank, (n) => onChange([n]))}</div>;
   return <div className="space-y-3">{items.map((it, i) => <div key={i} className="border border-line bg-paper">
     <div className="flex items-center gap-2 p-3"><button className="min-w-0 flex-1 truncate text-left text-sm font-bold" onClick={() => setOpen(open === i ? -1 : i)}>{title(it)}</button><Button variant="ghost" size="icon" title="Delete" onClick={() => onChange(items.filter((_, j) => j !== i))}><Trash2 /></Button><ChevronDown className={`size-4 transition ${open === i ? "rotate-180" : ""}`} /></div>
     {open === i && <div className="border-t border-line p-3">{render(it, (n) => onChange(items.map((x, j) => (j === i ? n : x))))}</div>}
@@ -320,7 +282,7 @@ function CheckoutDialog({ open, onOpenChange, email, paid }: { open: boolean; on
   void formatNGN;
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[94vh] w-[96vw] max-w-lg overflow-y-auto">
     {step < 3 && <div className="mb-1 flex gap-1">{["Plan", "Details", "Pay"].map((s, i) => <div key={s} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />)}</div>}
-    {step === 0 && <><DialogHeader><DialogTitle className="font-display text-3xl">Unlock JobPrimed Pro</DialogTitle><DialogDescription>All templates, premium sections & colors, unlimited PDF downloads.</DialogDescription></DialogHeader>
+    {step === 0 && <><DialogHeader><DialogTitle className="font-display text-3xl">Unlock JobPrimed Pro</DialogTitle><DialogDescription>All templates, premium sections & colours, unlimited PDF downloads.</DialogDescription></DialogHeader>
       <div className="space-y-2">{PLANS.map((x) => <button key={x.id} onClick={() => setPlan(x.id)} className={`flex w-full items-center justify-between border p-4 text-left ${plan === x.id ? "border-primary bg-coral-soft" : "border-line"}`}><span><b>{x.name}</b>{"featured" in x && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">POPULAR</span>}<br /><span className="text-xs text-muted-foreground">{x.note}</span></span><span className="font-display text-2xl">{formatUSD(x.usd)}</span></button>)}</div>
       <Button size="lg" className="w-full" onClick={() => setStep(1)}>Continue<ChevronRight /></Button></>}
     {step === 1 && <><DialogHeader><DialogTitle className="font-display text-3xl">Your details</DialogTitle><DialogDescription>We'll send your receipt here.</DialogDescription></DialogHeader>
@@ -335,7 +297,7 @@ function CheckoutDialog({ open, onOpenChange, email, paid }: { open: boolean; on
       <p className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4 text-mint-strong" />Secure payment by Paystack — card, bank transfer & USSD in NGN.</p>
       {err && <p className="text-sm text-destructive">{err}</p>}
       <div className="flex gap-2"><Button variant="ghost" onClick={() => setStep(1)}><ChevronLeft />Back</Button><Button className="flex-1" size="lg" disabled={busy || !rate} onClick={pay}>{busy ? <Loader2 className="animate-spin" /> : <LockKeyhole />}Pay {ngn}</Button></div></>}
-    {step === 3 && <div className="py-4 text-center"><span className="mx-auto grid size-14 place-items-center rounded-full bg-mint text-mint-strong"><Check className="size-7" /></span><DialogTitle className="mt-4 font-display text-3xl">You're Pro!</DialogTitle><DialogDescription className="mt-2">Every template, section and color is unlocked.</DialogDescription><Button className="mt-6 w-full" onClick={() => onOpenChange(false)}>Continue editing</Button></div>}
+    {step === 3 && <div className="py-4 text-center"><span className="mx-auto grid size-14 place-items-center rounded-full bg-mint text-mint-strong"><Check className="size-7" /></span><DialogTitle className="mt-4 font-display text-3xl">You're Pro!</DialogTitle><DialogDescription className="mt-2">Every template, section and colour is unlocked.</DialogDescription><Button className="mt-6 w-full" onClick={() => onOpenChange(false)}>Continue editing</Button></div>}
   </DialogContent></Dialog>;
 }
 
@@ -343,7 +305,7 @@ function ExportDialog({ open, onOpenChange, name }: { open: boolean; onOpenChang
   const [file, setFile] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const opened = useRef(false);
-  useEffect(() => { if (open && !opened.current) { setFile(`${(name || "Resume").replace(/\s+/g, "_")}_Resume`); } opened.current = open; if (open) setState("idle"); }, [open, name]);
+  useEffect(() => { if (open && !opened.current) { setFile(`${(name || "CV").replace(/\s+/g, "_")}_CV`); } opened.current = open; if (open) setState("idle"); }, [open, name]);
   const run = async () => {
     setState("busy");
     try {
@@ -352,13 +314,13 @@ function ExportDialog({ open, onOpenChange, name }: { open: boolean; onOpenChang
       const canvas = await html2canvas(node, { scale: 2.5, backgroundColor: null, useCORS: true });
       const pdf = new jsPDF({ unit: "mm", format: "a4" });
       pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 210, 297);
-      pdf.setProperties({ title: `${name} — resume`, creator: "JobPrimed" });
-      pdf.save(`${file || "Resume"}.pdf`);
+      pdf.setProperties({ title: `${name} — CV`, creator: "JobPrimed" });
+      pdf.save(`${file || "CV"}.pdf`);
       setState("done");
     } catch (e) { console.error(e); setState("error"); }
   };
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="w-[96vw] max-w-md">
-    <DialogHeader><DialogTitle className="font-display text-3xl">Download your resume</DialogTitle><DialogDescription>High-resolution A4 PDF, ready to send.</DialogDescription></DialogHeader>
+    <DialogHeader><DialogTitle className="font-display text-3xl">Download your CV</DialogTitle><DialogDescription>High-resolution A4 PDF, ready to send.</DialogDescription></DialogHeader>
     <div><Label htmlFor="fn">File name</Label><div className="mt-2 flex items-center gap-2"><Input id="fn" value={file} onChange={(e) => setFile(e.target.value)} /><span className="text-sm text-muted-foreground">.pdf</span></div></div>
     {state === "done" && <p className="flex items-center gap-2 text-sm text-mint-strong"><Check className="size-4" />Downloaded — good luck with your application!</p>}
     {state === "error" && <p className="text-sm text-destructive">Something went wrong creating the PDF. Please try again.</p>}

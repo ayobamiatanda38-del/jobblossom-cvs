@@ -50,7 +50,7 @@ function Drafter() {
     <p className="mt-3 max-w-2xl text-muted-foreground">Get a tailored cover letter built only from experience you actually have. Nothing is invented — gaps are handled honestly.</p>
     <div className="mt-9 grid gap-5 md:grid-cols-2">
       <div><Label htmlFor="job">Job description</Label><Textarea id="job" className="mt-2 min-h-72 bg-paper" placeholder="Paste the job posting here…" value={job} onChange={e => setJob(e.target.value)} /></div>
-      <div><Label htmlFor="Resume">Your resume</Label><Textarea id="Resume" className="mt-2 min-h-72 bg-paper" placeholder="Paste the text of your resume here…" value={resume} onChange={e => setResume(e.target.value)} /></div>
+      <div><Label htmlFor="resume">Your resume</Label><Textarea id="resume" className="mt-2 min-h-72 bg-paper" placeholder="Paste the text of your CV here…" value={resume} onChange={e => setResume(e.target.value)} /></div>
     </div>
     <div className="mt-5 flex flex-wrap items-center gap-3">
       <div className="flex gap-2" role="group" aria-label="Tone">
@@ -63,7 +63,7 @@ function Drafter() {
     {!ready && <p className="mt-2 text-xs text-muted-foreground">Paste a few lines in both boxes to begin.</p>}
     {err && <p role="alert" className="mt-6 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{err}</p>}
     {(busy || out) && <section aria-live="polite" className="mt-8 border-t border-line pt-8">
-      {busy && !out && <p className="text-sm text-muted-foreground animate-pulse">Reading the job and your resume…</p>}
+      {busy && !out && <p className="text-sm text-muted-foreground animate-pulse">Reading the job and your CV…</p>}
       <div className="max-w-3xl border border-line bg-paper p-7 whitespace-pre-line text-base leading-8 paper-shadow sm:p-10">{out}</div>
       {out && !busy && <p className="mt-6 text-xs text-muted-foreground">Review every line and only keep what is true for you. Fill in the bracketed details before sending.</p>}
     </section>}
