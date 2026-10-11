@@ -1,0 +1,12 @@
+CREATE TABLE public.marketing_preferences (user_id uuid PRIMARY KEY, email text NOT NULL, newsletter_opt_in boolean NOT NULL DEFAULT false, consented_at timestamptz, updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE ON public.marketing_preferences TO authenticated;
+GRANT ALL ON public.marketing_preferences TO service_role;
+ALTER TABLE public.marketing_preferences ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own prefs select" ON public.marketing_preferences FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Own prefs insert" ON public.marketing_preferences FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Own prefs update" ON public.marketing_preferences FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE TABLE public.cv_entitlements (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, reference text NOT NULL UNIQUE, plan text NOT NULL CHECK (plan IN ('week','month','year')), expires_at timestamptz NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.cv_entitlements TO authenticated;
+GRANT ALL ON public.cv_entitlements TO service_role;
+ALTER TABLE public.cv_entitlements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users read own CV purchases" ON public.cv_entitlements FOR SELECT TO authenticated USING (auth.uid() = user_id);

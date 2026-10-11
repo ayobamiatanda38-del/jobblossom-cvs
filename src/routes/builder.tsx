@@ -14,10 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResumePreview } from "@/components/resume-preview";
 import { AiSuggest } from "@/components/ai-suggest";
-import { PLANS, TEMPLATES, INDUSTRIES, formatNGN, formatUSD, getTemplate, USD_TO_NGN, type ResumeData } from "@/lib/templates";
+import { PLANS, TEMPLATES, INDUSTRIES, formatUSD, getTemplate, type ResumeData } from "@/lib/templates";
+import { CHECKOUT_MARKETS, marketFor, money, type Country } from "@/lib/checkout-markets";
 import { useSession } from "@/hooks/use-session";
 import { useServerFn } from "@tanstack/react-start";
-import { getExchangeRate, startCheckout, verifyPayment } from "@/lib/payments.functions";
+import { createCheckoutQuote, getEntitlement, startCheckout, verifyPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/builder")({
   validateSearch: z.object({ template: z.string().optional(), checkout: z.boolean().optional(), reference: z.string().optional(), trxref: z.string().optional() }),
@@ -58,7 +59,6 @@ const TIPS: Partial<Record<SectionId, string[]>> = {
 const STORE = "jobprimed:cv:v1";
 const emptyCV = (t: string): ResumeData => ({ ...getTemplate(t).sample, name: "", title: "", email: "", phone: "", location: "", website: "", summary: "", experience: [], education: [], skills: "", strengths: "", projects: "", languages: "", courses: "", awards: "", references: "" });
 const freeCV = (d: ResumeData): ResumeData => ({ ...d, projects: "", languages: "", references: "", strengths: "", courses: "", awards: "" });
-const PRO_KEY = "jobprimed:pro";
 
 function BuilderPage() {
   const search = Route.useSearch();
@@ -79,9 +79,13 @@ function BuilderPage() {
   const t = getTemplate(templateId);
 
   // Restore autosaved draft (unless user arrived by picking a specific template).
+  const entitlementFn = useServerFn(getEntitlement);
+  useEffect(() => {
+    if (!user) return;
+    entitlementFn().then((r) => { if (r.isPro) setIsPro(true); }).catch(() => {});
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     try {
-      setIsPro(localStorage.getItem(PRO_KEY) === "1");
       const raw = localStorage.getItem(STORE);
       if (raw) {
         const s = JSON.parse(raw) as { data: ResumeData; templateId: string; accent?: string };
@@ -105,7 +109,7 @@ function BuilderPage() {
     const ref = search.reference ?? search.trxref;
     if (!ref) return;
     verifyFn({ data: { reference: ref } }).then((r) => {
-      if (r.ok) { localStorage.setItem(PRO_KEY, "1"); setIsPro(true); setPaid(true); setCheckoutOpen(true); }
+      if (r.ok) { setIsPro(true); setPaid(true); setCheckoutOpen(true); }
       window.history.replaceState(null, "", "/builder");
     }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -262,41 +266,58 @@ function CheckoutDialog({ open, onOpenChange, email, paid }: { open: boolean; on
   const [mail, setMail] = useState(email ?? "");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [rate, setRate] = useState<{ rate: number; live: boolean } | null>(null);
-  const rateFn = useServerFn(getExchangeRate);
+  const [country, setCountry] = useState<Country>("US");
+  const [quote, setQuote] = useState<{ id: string; amountKobo: number; localAmount: number; currency: string; ngnRate: number; updatedAt: string } | null>(null);
+  const quoteFn = useServerFn(createCheckoutQuote);
   const checkoutFn = useServerFn(startCheckout);
-  useEffect(() => { if (open) { setStep(paid ? 3 : 0); setErr(""); rateFn().then(setRate).catch(() => setRate({ rate: USD_TO_NGN, live: false })); } }, [open, paid]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (open) { setStep(paid ? 3 : 0); setErr(""); setQuote(null); } }, [open, paid]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (email) setMail(email); }, [email]);
   const p = PLANS.find((x) => x.id === plan)!;
-  const r = rate?.rate ?? USD_TO_NGN;
-  const ngn = `₦${Math.round(p.usd * r).toLocaleString("en-NG")}`;
-  const pay = async () => {
+  const market = marketFor(country);
+  const ngn = quote ? `₦${Math.round(quote.amountKobo / 100).toLocaleString("en-NG")}` : "";
+  const prepare = async () => {
     setBusy(true); setErr("");
     try {
-      const res = await checkoutFn({ data: { plan, email: mail } });
+      const q = await quoteFn({ data: { plan, country } });
+      setQuote(q); setStep(2);
+    } catch { setErr("Could not prepare your payment. Please make sure you're logged in and try again."); }
+    setBusy(false);
+  };
+  const pay = async () => {
+    if (!quote) return;
+    setBusy(true); setErr("");
+    try {
+      const res = await checkoutFn({ data: { quoteId: quote.id, email: mail } });
       if ("url" in res && res.url) { window.location.href = res.url; return; }
       setErr(("error" in res && res.error) || "Could not start payment.");
     } catch { setErr("Could not start payment. Please try again."); }
     setBusy(false);
   };
-  void formatNGN;
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[94vh] w-[96vw] max-w-lg overflow-y-auto">
     {step < 3 && <div className="mb-1 flex gap-1">{["Plan", "Details", "Pay"].map((s, i) => <div key={s} className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />)}</div>}
     {step === 0 && <><DialogHeader><DialogTitle className="font-display text-3xl">Unlock JobPrimed Pro</DialogTitle><DialogDescription>All templates, premium sections & colours, unlimited PDF downloads.</DialogDescription></DialogHeader>
       <div className="space-y-2">{PLANS.map((x) => <button key={x.id} onClick={() => setPlan(x.id)} className={`flex w-full items-center justify-between border p-4 text-left ${plan === x.id ? "border-primary bg-coral-soft" : "border-line"}`}><span><b>{x.name}</b>{"featured" in x && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">POPULAR</span>}<br /><span className="text-xs text-muted-foreground">{x.note}</span></span><span className="font-display text-2xl">{formatUSD(x.usd)}</span></button>)}</div>
       <Button size="lg" className="w-full" onClick={() => setStep(1)}>Continue<ChevronRight /></Button></>}
-    {step === 1 && <><DialogHeader><DialogTitle className="font-display text-3xl">Your details</DialogTitle><DialogDescription>We'll send your receipt here.</DialogDescription></DialogHeader>
+    {step === 1 && <><DialogHeader><DialogTitle className="font-display text-3xl">Your details</DialogTitle><DialogDescription>We'll send your receipt here and show the price in your currency.</DialogDescription></DialogHeader>
       <F label="Email address" v={mail} on={setMail} />
-      <div className="flex gap-2"><Button variant="ghost" onClick={() => setStep(0)}><ChevronLeft />Back</Button><Button className="flex-1" disabled={!/\S+@\S+\.\S+/.test(mail)} onClick={() => setStep(2)}>Continue to payment</Button></div></>}
+      <div><Label htmlFor="country">Your country</Label>
+        <select id="country" value={country} onChange={(e) => setCountry(e.target.value as Country)} className="mt-2 h-11 w-full border border-line bg-paper px-3 text-sm">
+          {CHECKOUT_MARKETS.map((m) => <option key={m.country} value={m.country}>{m.name} — {m.currency}</option>)}
+        </select>
+        <p className="mt-2 text-xs text-muted-foreground">{market.methods}. Every plan is priced in US dollars and charged at the same rate wherever you are.</p>
+      </div>
+      {err && <p className="text-sm text-destructive">{err}</p>}
+      <div className="flex gap-2"><Button variant="ghost" onClick={() => setStep(0)}><ChevronLeft />Back</Button><Button className="flex-1" disabled={busy || !/\S+@\S+\.\S+/.test(mail)} onClick={prepare}>{busy ? <Loader2 className="animate-spin" /> : null}Continue to payment</Button></div></>}
     {step === 2 && <><DialogHeader><DialogTitle className="font-display text-3xl">Review & pay</DialogTitle><DialogDescription>Prices are in US dollars; you're charged the Naira equivalent.</DialogDescription></DialogHeader>
       <div className="space-y-2 border border-line bg-paper p-4 text-sm">
         <div className="flex justify-between"><span>{p.name}</span><b>{formatUSD(p.usd)}</b></div>
-        <div className="flex justify-between text-muted-foreground"><span>Exchange rate {rate?.live ? "(live)" : ""}</span><span>{rate ? `$1 = ₦${r.toLocaleString("en-NG", { maximumFractionDigits: 2 })}` : "Loading…"}</span></div>
+        {quote && country !== "US" && <div className="flex justify-between text-muted-foreground"><span>Equivalent in {market.currency}</span><span>{money(quote.localAmount, quote.currency, market.locale)}</span></div>}
+        <div className="flex justify-between text-muted-foreground"><span>Exchange rate (live)</span><span>{quote ? `$1 = ₦${quote.ngnRate.toLocaleString("en-NG", { maximumFractionDigits: 2 })}` : "Loading…"}</span></div>
         <div className="flex justify-between border-t border-line pt-2 text-base"><span className="font-bold">You pay today</span><b>{ngn}</b></div>
       </div>
-      <p className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4 text-mint-strong" />Secure payment by Paystack — card, bank transfer & USSD in NGN.</p>
+      <p className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4 text-mint-strong" />Secure payment by Paystack — {market.methods.toLowerCase()}, settled in NGN.</p>
       {err && <p className="text-sm text-destructive">{err}</p>}
-      <div className="flex gap-2"><Button variant="ghost" onClick={() => setStep(1)}><ChevronLeft />Back</Button><Button className="flex-1" size="lg" disabled={busy || !rate} onClick={pay}>{busy ? <Loader2 className="animate-spin" /> : <LockKeyhole />}Pay {ngn}</Button></div></>}
+      <div className="flex gap-2"><Button variant="ghost" onClick={() => setStep(1)}><ChevronLeft />Back</Button><Button className="flex-1" size="lg" disabled={busy || !quote} onClick={pay}>{busy ? <Loader2 className="animate-spin" /> : <LockKeyhole />}Pay {ngn}</Button></div></>}
     {step === 3 && <div className="py-4 text-center"><span className="mx-auto grid size-14 place-items-center rounded-full bg-mint text-mint-strong"><Check className="size-7" /></span><DialogTitle className="mt-4 font-display text-3xl">You're Pro!</DialogTitle><DialogDescription className="mt-2">Every template, section and colour is unlocked.</DialogDescription><Button className="mt-6 w-full" onClick={() => onOpenChange(false)}>Continue editing</Button></div>}
   </DialogContent></Dialog>;
 }

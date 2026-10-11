@@ -7,10 +7,13 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { ResumePreview } from "@/components/resume-preview";
 import { SiteHeader } from "@/components/site-header";
 import { TiltCV } from "@/components/tilt-cv";
-import f1 from "@/assets/face-1.jpg";
-import f2 from "@/assets/face-2.jpg";
-import f3 from "@/assets/face-3.jpg";
-import f4 from "@/assets/face-4.jpg";
+import f1Asset from "@/assets/face-1.jpg.asset.json";
+import f2Asset from "@/assets/face-2.jpg.asset.json";
+import f3Asset from "@/assets/face-3.jpg.asset.json";
+import f4Asset from "@/assets/face-4.jpg.asset.json";
+import { CreateResumeButton } from "@/components/create-resume-button";
+import { BuilderDemo } from "@/components/builder-demo";
+const [f1, f2, f3, f4] = [f1Asset.url, f2Asset.url, f3Asset.url, f4Asset.url];
 import { TEMPLATES, INDUSTRIES, PLANS, formatUSD } from "@/lib/templates";
 
 export const Route = createFileRoute("/")({
@@ -53,12 +56,12 @@ function HomePage() {
   return <div className="overflow-hidden bg-background text-foreground"><SiteHeader />
     <main>
       <section className="relative border-b border-line">
-        <div className="mx-auto grid min-h-[calc(100svh-68px)] max-w-7xl items-center gap-14 px-5 py-14 sm:py-20 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-24">
+        <div className="home-intro">
           <div className="relative z-10 animate-enter">
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"><Sparkles className="size-3.5 text-primary" />Your career, properly presented</p>
-            <h1 className="max-w-3xl font-display text-5xl leading-[.98] sm:text-7xl lg:text-[5.4rem]">Build a resume.<br/><span className="text-primary">Own the room.</span></h1>
+            <h1 className="home-headline"><span className="home-brand">JobPrimed</span><span>Build a resume.</span><span className="text-primary">Own the room.</span></h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">From first draft to final interview, JobPrimed helps you create a sharp, ATS-ready resume that sounds like you—on your best day.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button size="lg" variant="hero" asChild><Link to="/builder">Create my resume <ArrowRight /></Link></Button><Button size="lg" variant="outline" asChild><Link to="/" hash="examples">Browse examples</Link></Button></div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><CreateResumeButton large /><Button size="lg" variant="outline" asChild><Link to="/" hash="examples">Browse examples</Link></Button></div>
             <div className="mt-8 flex flex-wrap items-center gap-4 text-sm"><div className="flex -space-x-2">{[f1,f2,f3,f4].map((src,i)=><img key={i} src={src} alt="JobPrimed user" width={36} height={36} loading="lazy" className="size-9 rounded-full border-2 border-background object-cover" />)}</div><div><div className="flex text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="size-3.5 fill-current" />)}</div><p className="mt-1 text-xs text-muted-foreground">Rated 4.8/5 by job seekers</p></div></div>
             <div className="mt-6 flex flex-wrap gap-3">{[["Trustpilot","4.8","2,140 reviews"],["Google","4.9","860 reviews"],["Capterra","4.7","310 reviews"]].map(([n,r,c])=><div key={n} className="flex items-center gap-2 rounded-md border border-line bg-paper px-3 py-2 text-xs"><span className="flex text-mint-strong">{Array.from({length:5}).map((_,i)=><Star key={i} className="size-3 fill-current" />)}</span><span><b>{n}</b> {r} · <span className="text-muted-foreground">{c}</span></span></div>)}</div>
           </div>
@@ -67,6 +70,8 @@ function HomePage() {
       </section>
 
       <section className="border-b border-line bg-ink text-paper"><div className="mx-auto grid max-w-6xl grid-cols-2 gap-px md:grid-cols-4">{[["16","Resume templates"],["4","free core sections"],["3","letter styles"],["A4","PDF export"]].map(([a,b])=><div key={b} className="border-line/20 px-5 py-8 text-center md:border-r"><p className="font-display text-3xl">{a}</p><p className="mt-1 text-xs text-paper/60">{b}</p></div>)}</div></section>
+
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:py-28 lg:px-8"><div className="mx-auto max-w-3xl text-center"><p className="text-xs font-bold uppercase tracking-[.16em] text-primary">Watch it work</p><h2 className="mt-4 font-display text-4xl leading-tight sm:text-6xl">Type on the left. Watch your resume build itself on the right.</h2><p className="mt-5 leading-7 text-muted-foreground">Every keystroke updates your resume instantly — switch templates anytime and your content follows.</p></div><div className="mt-12"><BuilderDemo /></div></section>
 
       <section id="tools" className="mx-auto max-w-7xl px-5 py-20 sm:py-28 lg:px-8"><div className="mx-auto max-w-3xl text-center"><p className="text-xs font-bold uppercase tracking-[.16em] text-primary">One toolkit. Better applications.</p><h2 className="mt-4 font-display text-4xl leading-tight sm:text-6xl">Everything you need to move from maybe to hired.</h2></div>
         <div className="mt-12 flex gap-2 overflow-x-auto border-b border-line pb-px">{tools.map((item)=><Button key={item.id} variant="ghost" onClick={()=>setActive(item.id)} className={`h-auto shrink-0 rounded-none border-b-2 px-4 py-4 ${active===item.id?"border-primary text-ink":"border-transparent text-muted-foreground"}`}><item.icon />{item.label}</Button>)}</div>

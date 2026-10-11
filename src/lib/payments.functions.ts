@@ -1,70 +1,79 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { PLANS, USD_TO_NGN } from "./templates";
+import { PLANS } from "./templates";
+import { marketFor, paymentMatches, quoteAmounts } from "./checkout-markets";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-let cache: { rate: number; source: string; at: number } | null = null;
+export const getExchangeRate = createServerFn({ method: "GET" }).handler(async () => {
+  const { fetchRates } = await import("./exchange-rates.server");
+  return fetchRates();
+});
 
-async function fetchRate(): Promise<{ rate: number; source: string; live: boolean }> {
-  if (cache && Date.now() - cache.at < 60 * 60 * 1000) return { rate: cache.rate, source: cache.source, live: true };
-  const sources: [string, string, (j: any) => number | undefined][] = [
-    ["open.er-api.com", "https://open.er-api.com/v6/latest/USD", (j) => j?.rates?.NGN],
-    ["fawazahmed0 currency-api", "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json", (j) => j?.usd?.ngn],
-    ["currency-api mirror", "https://latest.currency-api.pages.dev/v1/currencies/usd.json", (j) => j?.usd?.ngn],
-  ];
-  for (const [name, url, pick] of sources) {
-    try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(4000) });
-      if (!r.ok) continue;
-      const rate = Number(pick(await r.json()));
-      if (rate > 100 && rate < 100000) {
-        cache = { rate, source: name, at: Date.now() };
-        return { rate, source: name, live: true };
-      }
-    } catch (e) { console.error(`Rate source ${name} failed`, e); }
-  }
-  if (cache) return { rate: cache.rate, source: cache.source, live: false };
-  return { rate: USD_TO_NGN, source: "fallback", live: false };
-}
-
-export const getExchangeRate = createServerFn({ method: "GET" }).handler(async () => fetchRate());
-
-const planIds = PLANS.map((p) => p.id) as [string, ...string[]];
-
-export const startCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ plan: z.enum(planIds), email: z.string().email().max(255) }).parse(d))
-  .handler(async ({ data }) => {
-    const key = process.env["PAYSTACK_SECRET_KEY"];
-    if (!key) return { error: "Payments are not configured yet." };
-    const plan = PLANS.find((p) => p.id === data.plan)!;
-    const { rate } = await fetchRate();
-    const kobo = Math.round(plan.usd * rate) * 100;
-    const origin = new URL(getRequest().url).origin;
-    const res = await fetch("https://api.paystack.co/transaction/initialize", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: data.email, amount: kobo, currency: "NGN",
-        callback_url: `${origin}/builder`,
-        metadata: { plan: plan.id, usd: plan.usd, rate },
-      }),
-    });
-    const body = await res.text();
-    if (!res.ok) { console.error(`Paystack init failed [${res.status}]: ${body}`); return { error: "Could not start payment. Please try again." }; }
-    const j = JSON.parse(body);
-    return { url: j.data.authorization_url as string };
+export const createCheckoutQuote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ plan: z.enum(["week", "month", "year"]), country: z.enum(["US", "NG", "KE", "GH", "ZA", "CI"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const plan = PLANS.find(p => p.id === data.plan);
+    if (!plan) throw new Error("Invalid plan");
+    const { fetchRates } = await import("./exchange-rates.server");
+    const snapshot = await fetchRates();
+    const amounts = quoteAmounts(plan.usd, data.country, snapshot.rates);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: quote, error } = await supabaseAdmin.from("checkout_quotes").insert({ user_id: context.userId, plan: plan.id, country: data.country, usd_amount: plan.usd, amount_kobo: amounts.amountKobo, local_amount: amounts.localAmount, local_currency: amounts.currency, ngn_rate: amounts.ngnRate }).select("id, expires_at").single();
+    if (error || !quote) throw new Error("Could not prepare your payment quote.");
+    return { id: quote.id, expiresAt: quote.expires_at, ...amounts, usd: plan.usd, updatedAt: snapshot.updatedAt };
   });
 
+export const startCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ quoteId: z.string().uuid(), email: z.string().email().max(255) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const key = process.env["PAYSTACK_SECRET_KEY"];
+    if (!key) return { error: "Payments are not available yet. Please try again later." };
+    const { data: quote } = await context.supabase.from("checkout_quotes").select("*").eq("id", data.quoteId).eq("user_id", context.userId).single();
+    if (!quote || Date.parse(quote.expires_at) <= Date.now()) return { error: "Your quote expired. Go back to refresh the amount." };
+    const reference = quote.reference ?? `jp-${crypto.randomUUID()}`;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("checkout_quotes").update({ reference }).eq("id", quote.id).eq("user_id", context.userId);
+    if (error) return { error: "Could not prepare your payment." };
+    const origin = new URL(getRequest().url).origin;
+    const response = await fetch("https://api.paystack.co/transaction/initialize", {
+      method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email, amount: quote.amount_kobo, currency: "NGN", reference, channels: marketFor(quote.country).channels, callback_url: `${origin}/builder`, metadata: { plan: quote.plan, user_id: context.userId, quote_id: quote.id, usd: quote.usd_amount, rate: quote.ngn_rate, country: quote.country } }),
+    });
+    const body = await response.text();
+    if (!response.ok) { console.error(`Paystack initialize [${response.status}]: ${body}`); return { error: "Paystack could not start payment. Please try again." }; }
+    const result = JSON.parse(body) as { status?: boolean; data?: { authorization_url?: string } };
+    if (!result.status || !result.data?.authorization_url) return { error: "Paystack could not start payment." };
+    return { url: result.data.authorization_url };
+  });
+
+export const getEntitlement = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { data, error } = await context.supabase.from("cv_entitlements").select("expires_at").eq("user_id", context.userId).gt("expires_at", new Date().toISOString()).limit(1);
+  if (error) throw new Error("Could not check your Pro access.");
+  return { isPro: Boolean(data?.length) };
+});
+
 export const verifyPayment = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ reference: z.string().min(1).max(200).regex(/^[\w.-]+$/) }).parse(d))
-  .handler(async ({ data }) => {
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reference: z.string().min(1).max(200).regex(/^[\w.-]+$/) }).parse(d))
+  .handler(async ({ data, context }) => {
     const key = process.env["PAYSTACK_SECRET_KEY"];
     if (!key) return { ok: false as const };
-    const res = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(data.reference)}`, { headers: { Authorization: `Bearer ${key}` } });
-    const body = await res.text();
-    if (!res.ok) { console.error(`Paystack verify failed [${res.status}]: ${body}`); return { ok: false as const }; }
-    const t = JSON.parse(body).data;
-    const plan = PLANS.find((p) => p.id === t?.metadata?.plan);
-    if (t?.status !== "success" || t.currency !== "NGN" || !plan) return { ok: false as const };
-    return { ok: true as const, plan: plan.id };
+    const { data: quote } = await context.supabase.from("checkout_quotes").select("*").eq("reference", data.reference).eq("user_id", context.userId).single();
+    if (!quote) return { ok: false as const };
+    const response = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(data.reference)}`, { headers: { Authorization: `Bearer ${key}` } });
+    const body = await response.text();
+    if (!response.ok) { console.error(`Paystack verify [${response.status}]: ${body}`); return { ok: false as const }; }
+    const transaction = JSON.parse(body).data;
+    if (!paymentMatches(quote, transaction, context.userId)) return { ok: false as const };
+    const paidAt = Date.parse(transaction.paid_at);
+    if (!Number.isFinite(paidAt)) return { ok: false as const };
+    const days = quote.plan === "week" ? 7 : quote.plan === "month" ? 30 : 365;
+    const expiresAt = new Date(paidAt + days * 86400000).toISOString();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("cv_entitlements").upsert({ user_id: context.userId, reference: data.reference, plan: quote.plan, expires_at: expiresAt }, { onConflict: "reference", ignoreDuplicates: true });
+    if (error) throw new Error("Your payment succeeded but access could not be saved. Please retry verification.");
+    return { ok: Date.parse(expiresAt) > Date.now(), plan: quote.plan };
   });

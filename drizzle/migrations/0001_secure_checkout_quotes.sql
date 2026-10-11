@@ -1,0 +1,5 @@
+CREATE TABLE public.checkout_quotes (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, plan text NOT NULL CHECK (plan IN ('week','month','year')), country text NOT NULL CHECK (country IN ('US','NG','KE','GH','ZA','CI')), usd_amount numeric NOT NULL, amount_kobo bigint NOT NULL, local_amount numeric NOT NULL, local_currency text NOT NULL, ngn_rate numeric NOT NULL, reference text UNIQUE, expires_at timestamptz NOT NULL DEFAULT (now() + interval '15 minutes'), created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.checkout_quotes TO authenticated;
+GRANT ALL ON public.checkout_quotes TO service_role;
+ALTER TABLE public.checkout_quotes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Owners read their checkout quotes" ON public.checkout_quotes FOR SELECT TO authenticated USING (auth.uid() = user_id);

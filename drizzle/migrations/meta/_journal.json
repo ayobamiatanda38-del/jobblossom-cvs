@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1791327516345,
-      "tag": "0000_migration",
+      "when": 1791520461338,
+      "tag": "0000_resume_payments_and_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791520564636,
+      "tag": "0001_secure_checkout_quotes",
       "breakpoints": true
     }
   ]

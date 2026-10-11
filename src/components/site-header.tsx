@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
+import { CreateResumeButton } from "@/components/create-resume-button";
 
 const nav = [["Resume tools", "tools"], ["Examples", "examples"], ["How it works", "how"], ["Pricing", "pricing"], ["FAQ", "faq"]] as const;
 
@@ -21,30 +22,30 @@ export function SiteHeader() {
   </>;
   return (
     <header className="sticky top-0 z-50 border-b border-line/70 bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-5 lg:px-8">
-        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-ink">
+      <div className="site-header-inner">
+        <Link to="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xl font-bold text-ink">
           <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground"><FileText className="size-4" /></span>JobPrimed
         </Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-muted-foreground lg:flex">
+        <nav className="desktop-navigation">
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} className="hover:text-ink">{l}</Link>)}
           <Link to="/resume-tailor" className="hover:text-ink">Resume tailor</Link>
           <Link to="/jobs" className="hover:text-ink">Jobs</Link>
           <Link to="/cover-letter-drafter" className="hover:text-ink">Cover letter AI</Link>
         </nav>
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="desktop-account-actions">
           <AuthButtons />
-          <Button variant="hero" asChild><Link to="/builder">Create my resume</Link></Button>
+          <CreateResumeButton />
         </div>
-        <Button variant="ghost" size="icon" aria-label="Toggle menu" className="lg:hidden" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
+        <div className="compact-header-actions"><CreateResumeButton /><Button variant="ghost" size="icon" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button></div>
       </div>
-      {open && <nav className="border-t border-line bg-background px-5 py-4 lg:hidden">
+      {open && <nav className="compact-navigation border-t border-line bg-background px-5 py-4">
         <div className="flex flex-col gap-2 text-sm font-medium">
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} onClick={() => setOpen(false)} className="py-2">{l}</Link>)}
           <Link to="/resume-tailor" onClick={() => setOpen(false)} className="py-2">Resume tailor</Link>
           <Link to="/jobs" onClick={() => setOpen(false)} className="py-2">Jobs</Link>
           <Link to="/cover-letter-drafter" onClick={() => setOpen(false)} className="py-2">Cover letter AI</Link>
           <AuthButtons mobile />
-          <Button asChild><Link to="/builder">Create my resume</Link></Button>
+          <CreateResumeButton />
         </div>
       </nav>}
     </header>

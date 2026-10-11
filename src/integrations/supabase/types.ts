@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkout_quotes: {
+        Row: {
+          amount_kobo: number
+          country: string
+          created_at: string
+          expires_at: string
+          id: string
+          local_amount: number
+          local_currency: string
+          ngn_rate: number
+          plan: string
+          reference: string | null
+          usd_amount: number
+          user_id: string
+        }
+        Insert: {
+          amount_kobo: number
+          country: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          local_amount: number
+          local_currency: string
+          ngn_rate: number
+          plan: string
+          reference?: string | null
+          usd_amount: number
+          user_id: string
+        }
+        Update: {
+          amount_kobo?: number
+          country?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          local_amount?: number
+          local_currency?: string
+          ngn_rate?: number
+          plan?: string
+          reference?: string | null
+          usd_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cv_entitlements: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          plan: string
+          reference: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          plan: string
+          reference: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          plan?: string
+          reference?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketing_preferences: {
         Row: {
           consented_at: string | null
