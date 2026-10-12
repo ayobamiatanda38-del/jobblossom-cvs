@@ -14,8 +14,8 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const signOut = async () => { await supabase.auth.signOut(); navigate({ to: "/", replace: true }); };
   const AuthButtons = ({ mobile }: { mobile?: boolean }) => user ? <>
-    <span className="max-w-40 truncate text-sm text-muted-foreground">{user.email}</span>
-    <Button variant="ghost" onClick={signOut}><LogOut />Sign out</Button>
+    <span className="max-w-40 truncate rounded-md border border-line bg-paper px-3 py-2 text-sm text-muted-foreground">{user.email}</span>
+    <Button variant={mobile ? "outline" : "ghost"} onClick={signOut}><LogOut />Sign out</Button>
   </> : <>
     <Button variant={mobile ? "outline" : "ghost"} asChild><Link to="/auth" search={{ mode: "signin" }}>Log in</Link></Button>
     <Button variant={mobile ? "outline" : "ghost"} asChild><Link to="/auth" search={{ mode: "signup" }}>Sign up</Link></Button>
@@ -30,7 +30,7 @@ export function SiteHeader() {
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} className="hover:text-ink">{l}</Link>)}
           <Link to="/resume-tailor" className="hover:text-ink">Resume tailor</Link>
           <Link to="/jobs" className="hover:text-ink">Jobs</Link>
-          <Link to="/cover-letter-drafter" className="hover:text-ink">Cover letter AI</Link>
+          <Link to="/cover-letter-drafter" className="hover:text-ink">Build your cover letter</Link>
         </nav>
         <div className="desktop-account-actions">
           <AuthButtons />
@@ -43,7 +43,7 @@ export function SiteHeader() {
           {nav.map(([l, id]) => <Link key={id} to="/" hash={id} onClick={() => setOpen(false)} className="py-2">{l}</Link>)}
           <Link to="/resume-tailor" onClick={() => setOpen(false)} className="py-2">Resume tailor</Link>
           <Link to="/jobs" onClick={() => setOpen(false)} className="py-2">Jobs</Link>
-          <Link to="/cover-letter-drafter" onClick={() => setOpen(false)} className="py-2">Cover letter AI</Link>
+          <Link to="/cover-letter-drafter" onClick={() => setOpen(false)} className="py-2">Build your cover letter</Link>
           <AuthButtons mobile />
           <CreateResumeButton />
         </div>
