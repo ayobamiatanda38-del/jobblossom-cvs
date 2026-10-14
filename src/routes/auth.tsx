@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import { useSession } from "@/hooks/use-session";
 import { rememberNewsletterChoice, syncNewsletterChoice } from "@/lib/marketing-consent";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: z.object({ mode: z.enum(["signin", "signup"]).optional() }),
+  validateSearch: z.object({ mode: z.enum(["signin", "signup"]).optional(), redirect: z.string().optional() }),
   head: () => ({ meta: [
     { title: "Log in or sign up — JobPrimed" },
     { name: "description", content: "Sign in to JobPrimed to save your resumes and unlock Pro templates." },
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { mode: initial } = Route.useSearch();
+  const { mode: initial, redirect } = Route.useSearch();
   const [mode, setMode] = useState(initial ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,11 +35,15 @@ function AuthPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const { user } = useSession();
   const navigate = useNavigate();
+  const router = useRouter();
   useEffect(() => { setMode(initial ?? "signin"); }, [initial]);
   useEffect(() => {
     if (!user) return;
-    syncNewsletterChoice(user.id, user.email ?? "").finally(() => navigate({ to: "/builder" }));
-  }, [user, navigate]);
+    syncNewsletterChoice(user.id, user.email ?? "").finally(() => {
+      if (redirect && redirect.startsWith("/")) router.history.push(redirect);
+      else navigate({ to: "/builder" });
+    });
+  }, [user, navigate, router, redirect]);
   const remember = () => { rememberNewsletterChoice(newsletter); };
   const canProceed = agreed;
 
@@ -67,11 +71,11 @@ function AuthPage() {
       const onLovableHost = /\.lovable\.app$|^localhost$/.test(window.location.hostname);
       if (!onLovableHost) {
         // Off Lovable hosting (e.g. Vercel) the managed sign-in helper is unavailable; use the backend's OAuth directly.
-        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth` } });
+        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}` } });
         if (error) setMsg({ ok: false, text: error.message });
         return;
       }
-      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}` });
       if (r.error) setMsg({ ok: false, text: String(r.error.message ?? r.error) });
     } catch (e) { setMsg({ ok: false, text: e instanceof Error ? e.message : "Google sign-in could not open. Please try again." }); }
     finally { setBusy(false); }
