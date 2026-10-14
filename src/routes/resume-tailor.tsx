@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site-header";
+import { ResumeUpload } from "@/components/resume-upload";
 
 export const Route = createFileRoute("/resume-tailor")({
   head: () => ({ meta: [
@@ -43,7 +44,7 @@ function Tailor() {
     <p className="mt-3 max-w-2xl text-muted-foreground">Get suggested edits that match your CV to a job — using only experience you already have. Nothing is invented.</p>
     <div className="mt-9 grid gap-5 md:grid-cols-2">
       <div><Label htmlFor="job">Job description</Label><Textarea id="job" className="mt-2 min-h-72 bg-paper" placeholder="Paste the job posting here…" value={job} onChange={e => setJob(e.target.value)} /></div>
-      <div><Label htmlFor="resume">Your resume</Label><Textarea id="resume" className="mt-2 min-h-72 bg-paper" placeholder="Paste the text of your CV here…" value={resume} onChange={e => setResume(e.target.value)} /></div>
+      <div><Label>Upload your resume</Label><div className="mt-2"><ResumeUpload onText={setResume} /></div>{resume && <p className="mt-2 text-xs text-muted-foreground">Resume loaded — {resume.length} characters.</p>}</div>
     </div>
     <div className="mt-5 flex flex-wrap gap-3">
       {busy ? <Button variant="outline" onClick={() => ctrl.current?.abort()}><Square />Stop</Button>
