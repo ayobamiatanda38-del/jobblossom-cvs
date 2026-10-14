@@ -23,6 +23,11 @@ export function ResumePreview({ data, template, className, accent }: Props) {
     </div>
   );
 
+  const Photo = ({ className }: { className?: string | undefined }) =>
+    t.photo && d.photo && d.showPhoto !== false
+      ? <img src={d.photo} alt={d.name} className={cn("rounded-full object-cover", className)} />
+      : <div className={cn("grid place-items-center rounded-full bg-paper/20 font-bold", className)}>{initials(d.name)}</div>;
+
   const H = ({ children }: { children: ReactNode }) => (
     <h3 className={cn("mb-1.5 text-[9px] font-bold uppercase tracking-[.14em] cv-accent", t.layout === "minimal" && "border-b border-line pb-1")}>{children}</h3>
   );
@@ -52,7 +57,7 @@ export function ResumePreview({ data, template, className, accent }: Props) {
     <article style={style} className={cn("cv-root aspect-[1/1.414] w-full overflow-hidden bg-paper text-ink paper-shadow", font, className)}>
       {t.layout === "sidebar" && <div className="grid h-full grid-cols-[36%_64%]">
         <aside className="cv-bg h-full space-y-4 p-5 text-paper [&_.cv-accent]:text-paper">
-          <div className="grid size-14 place-items-center rounded-full bg-paper/20 text-lg font-bold">{initials(d.name)}</div>
+          <Photo className="size-14 text-lg" />
           <div><h1 className="text-lg font-bold leading-tight">{d.name}</h1><p className="text-[10px] opacity-90">{d.title}</p></div>
           <div className="cv-small space-y-1 opacity-90"><p>{d.email}</p><p>{d.phone}</p><p>{d.location}</p><p>{d.website}</p></div>
           <Side light />
@@ -61,13 +66,13 @@ export function ResumePreview({ data, template, className, accent }: Props) {
       </div>}
 
       {t.layout === "banner" && <div>
-        <header className="cv-bg px-6 py-5 text-paper"><h1 className="text-2xl font-bold">{d.name}</h1><p className="text-[11px] opacity-90">{d.title}</p><div className="mt-2"><Contact light /></div></header>
+        <header className="cv-bg flex items-center gap-4 px-6 py-5 text-paper">{t.photo && <Photo className="size-14 text-lg" />}<div><h1 className="text-2xl font-bold">{d.name}</h1><p className="text-[11px] opacity-90">{d.title}</p><div className="mt-2"><Contact light /></div></div></header>
         <div className="grid grid-cols-[62%_38%] gap-5 p-6"><Main /><Side /></div>
       </div>}
 
       {t.layout === "split" && <div className="grid h-full grid-cols-[62%_38%]">
         <div className="space-y-4 p-6"><div className="border-l-4 cv-border pl-3"><h1 className="text-2xl font-bold leading-none">{d.name}</h1><p className="mt-1 text-[11px] cv-accent">{d.title}</p></div><Main /></div>
-        <aside className="cv-soft h-full space-y-4 p-5"><div className="cv-small space-y-1"><p>{d.email}</p><p>{d.phone}</p><p>{d.location}</p><p>{d.website}</p></div><Side /></aside>
+        <aside className="cv-soft h-full space-y-4 p-5">{t.photo && <Photo className="size-16 text-lg" />}<div className="cv-small space-y-1"><p>{d.email}</p><p>{d.phone}</p><p>{d.location}</p><p>{d.website}</p></div><Side /></aside>
       </div>}
 
       {(t.layout === "classic" || t.layout === "minimal" || t.layout === "timeline") && <div className="space-y-4 p-7">
