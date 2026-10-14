@@ -253,3 +253,12 @@ input:focus::placeholder, textarea:focus::placeholder { opacity: 0; }
 @media (max-width: 767px) { .home-intro { padding: 44px 22px; gap: 28px; } .home-headline { font-size: 44px; } .site-header-inner { padding-inline: 16px; gap: 10px; min-height: 68px; } .site-header-inner > a { font-size: 18px; } .compact-header-actions > button:first-child { padding-inline: 12px; font-size: 12px; } .template-picker { padding: 20px; } .template-option { flex-basis: 210px; } .cookie-strip { inset-inline: 12px; bottom: 12px; padding: 22px; padding-top: 32px; } .cookie-photo { width: 70px; height: 70px; left: auto; right: 12px; top: -40px; } .cookie-content { flex-direction: column; align-items: start; gap: 16px; } }
 @media (max-width: 359px) { .home-headline { font-size: 38px; } .compact-header-actions > button:first-child { padding-inline: 8px; font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .cookie-strip, .cookie-photo { animation: none; } .template-option { transition: none; } }
+
+/* Smooth cross-fade between pages. Supported in Chrome/Edge/Opera today; no-op
+   (instant navigation, same as before) in browsers that don't support it yet. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: page-fade-out 150ms ease both; }
+::view-transition-new(root) { animation: page-fade-in 220ms ease both; }
+@keyframes page-fade-out { to { opacity: 0; } }
+@keyframes page-fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }
