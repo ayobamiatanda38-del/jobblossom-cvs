@@ -33,6 +33,7 @@ export type Template = {
   accent: string;
   font: "sans" | "serif";
   pro?: boolean;
+  photo?: boolean;
   score: number;
   sample: ResumeData;
 };
@@ -71,7 +72,7 @@ export const TEMPLATES: Template[] = [
        { role: "Marketing Associate", company: "Paystream", period: "2018 — 2021", details: "Grew email revenue 2.4× through lifecycle segmentation." }],
       [{ degree: "B.Sc. Business Administration", school: "University of Lagos", period: "2014 — 2018" }],
       "Go-to-market, Customer research, Analytics, Positioning, HubSpot", { languages: "English — Native · French — Conversational", courses: "Google Analytics Certification" }) },
-  { id: "axis", name: "Axis", industry: "Technology", role: "Software Engineer", layout: "sidebar", accent: "oklch(0.45 0.12 250)", font: "sans", score: 97,
+  { id: "axis", name: "Axis", industry: "Technology", role: "Software Engineer", layout: "sidebar", accent: "oklch(0.45 0.12 250)", font: "sans", photo: true, score: 97,
     sample: p("Daniel Reyes", "Senior Software Engineer", "Austin, TX", "Backend engineer who ships reliable, well-tested services at scale. Passionate about developer experience and mentoring.",
       [{ role: "Senior Software Engineer", company: "Streamline", period: "2020 — Present", details: "Re-architected billing service handling $40M/yr with zero downtime.\nCut p95 API latency from 480ms to 120ms." },
        { role: "Software Engineer", company: "Brightwave", period: "2017 — 2020", details: "Built event pipeline processing 2B events/day on Kafka." }],
@@ -88,7 +89,7 @@ export const TEMPLATES: Template[] = [
       [{ role: "Financial Analyst", company: "Harbor Capital", period: "2021 — Present", details: "Built 3-statement models for 15+ deals totalling £600M.\nAutomated monthly reporting, saving 30 hours per cycle." }],
       [{ degree: "M.Sc. Finance", school: "London School of Economics", period: "2019 — 2020" }, { degree: "B.Sc. Economics", school: "Obafemi Awolowo University", period: "2014 — 2018" }],
       "Financial modelling, Valuation, Excel/VBA, Power BI, SQL", { courses: "CFA Level II Candidate" }) },
-  { id: "canvas", name: "Canvas", industry: "Design", role: "Product Designer", layout: "split", accent: "oklch(0.6 0.18 330)", font: "sans", pro: true, score: 91,
+  { id: "canvas", name: "Canvas", industry: "Design", role: "Product Designer", layout: "split", accent: "oklch(0.6 0.18 330)", font: "sans", pro: true, photo: true, score: 91,
     sample: p("Maya Chen", "Product Designer", "Toronto, Canada", "Product designer crafting accessible, joyful interfaces for fintech and health. I pair research rigor with visual polish.",
       [{ role: "Senior Product Designer", company: "Wealthly", period: "2020 — Present", details: "Redesigned onboarding, lifting activation 22%.\nBuilt the design system used by 40 engineers." },
        { role: "UI Designer", company: "Studio North", period: "2017 — 2020", details: "Shipped 20+ client apps across mobile and web." }],
@@ -114,7 +115,7 @@ export const TEMPLATES: Template[] = [
       [{ role: "Associate", company: "Aluko & Oyebode", period: "2020 — Present", details: "Advised on 9 cross-border M&A deals worth $1.2B.\nDrafted SEC filings for two IPOs." }],
       [{ degree: "LL.B (Hons)", school: "University of Nigeria", period: "2012 — 2017" }, { degree: "B.L.", school: "Nigerian Law School", period: "2018" }],
       "M&A, Due diligence, Contract drafting, Regulatory compliance") },
-  { id: "plate", name: "Plate", industry: "Hospitality", role: "Head Chef", layout: "split", accent: "oklch(0.55 0.16 45)", font: "serif", score: 89,
+  { id: "plate", name: "Plate", industry: "Hospitality", role: "Head Chef", layout: "split", accent: "oklch(0.55 0.16 45)", font: "serif", photo: true, score: 89,
     sample: p("Marco Bianchi", "Head Chef", "Cape Town, SA", "Creative head chef blending Italian technique with local produce. Runs efficient, happy kitchens with low waste.",
       [{ role: "Head Chef", company: "Olea Restaurant", period: "2019 — Present", details: "Earned 2-star rating in Eat Out guide.\nCut food cost from 34% to 27%." }],
       [{ degree: "Diploma in Culinary Arts", school: "Silwood School", period: "2012 — 2014" }],
@@ -124,12 +125,12 @@ export const TEMPLATES: Template[] = [
       [{ role: "Research Intern", company: "Central Bank of Nigeria", period: "Summer 2024", details: "Cleaned and analyzed 10 years of inflation data in Stata.\nPresented findings to the monetary policy research team." }],
       [{ degree: "B.Sc. Economics (First Class)", school: "Bayero University", period: "2020 — 2024" }],
       "Stata, Excel, Python basics, Report writing, Public speaking", { awards: "Best Graduating Student, Faculty of Social Sciences" }) },
-  { id: "route", name: "Route", industry: "Logistics", role: "Operations Manager", layout: "sidebar", accent: "oklch(0.5 0.1 230)", font: "sans", score: 91,
+  { id: "route", name: "Route", industry: "Logistics", role: "Operations Manager", layout: "sidebar", accent: "oklch(0.5 0.1 230)", font: "sans", photo: true, score: 91,
     sample: p("Chidinma Eze", "Operations Manager", "Port Harcourt, Nigeria", "Operations leader who turns messy supply chains into predictable, measurable systems.",
       [{ role: "Operations Manager", company: "GIG Logistics", period: "2019 — Present", details: "Improved on-time delivery from 81% to 96%.\nLaunched 3 new hubs serving 200k parcels/month." }],
       [{ degree: "B.Sc. Industrial Engineering", school: "University of Port Harcourt", period: "2011 — 2015" }],
       "Supply chain, Lean Six Sigma, Fleet management, Excel, SAP") },
-  { id: "pulse", name: "Pulse", industry: "Creative", role: "Content Creator", layout: "banner", accent: "oklch(0.6 0.22 300)", font: "sans", pro: true, score: 88,
+  { id: "pulse", name: "Pulse", industry: "Creative", role: "Content Creator", layout: "banner", accent: "oklch(0.6 0.22 300)", font: "sans", pro: true, photo: true, score: 88,
     sample: p("Kemi Alade", "Content Creator & Social Strategist", "Los Angeles, CA", "Storyteller with 400k followers who helps brands show up authentically on TikTok, YouTube and Instagram.",
       [{ role: "Social Lead", company: "Wavelength Media", period: "2021 — Present", details: "Grew client TikTok from 0 to 1.2M followers in 10 months.\nProduced campaigns with 50M+ organic views." }],
       [{ degree: "BA Media Studies", school: "UCLA", period: "2015 — 2019" }],
@@ -144,7 +145,7 @@ export const TEMPLATES: Template[] = [
       [{ role: "Lead Electrician", company: "BrightSpark Electrical", period: "2016 — Present", details: "Installed 150+ residential solar systems.\nMaintained perfect safety inspection record." }],
       [{ degree: "Electrical Apprenticeship (Level 6)", school: "SOLAS", period: "2010 — 2014" }],
       "Wiring, Solar PV, Fault finding, Blueprint reading, Safety compliance") },
-  { id: "noir", name: "Noir Executive", industry: "Executive", role: "Chief Operating Officer", layout: "split", accent: "oklch(0.25 0.02 270)", font: "serif", pro: true, score: 97,
+  { id: "noir", name: "Noir Executive", industry: "Executive", role: "Chief Operating Officer", layout: "split", accent: "oklch(0.25 0.02 270)", font: "serif", pro: true, photo: true, score: 97,
     sample: p("Victoria Hale", "Chief Operating Officer", "New York, NY", "Operator who scales companies from Series B to IPO. 15 years leading global teams across fintech and SaaS.",
       [{ role: "Chief Operating Officer", company: "Finlytic", period: "2019 — Present", details: "Scaled headcount from 120 to 900 across 6 countries.\nLed operations through a $2.1B IPO." },
        { role: "VP Operations", company: "Cloudline", period: "2014 — 2019", details: "Built customer success org that cut churn by 40%." }],
