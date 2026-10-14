@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ResumePreview } from "@/components/resume-preview";
 import { RichTextarea } from "@/components/rich-textarea";
 import { AiSuggest } from "@/components/ai-suggest";
@@ -207,7 +206,7 @@ function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTempl
   accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string; photoTemplate: boolean;
 }) {
   const join = (a: string, b: string, sep: string) => (a.trim() ? `${a.trim()}${sep}${b}` : b);
-  const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
+  const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><RichTextarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(v) => up(k, v as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
   switch (active) {
     case "personal": return <div className="grid gap-4 sm:grid-cols-2">
       {photoTemplate && <div className="sm:col-span-2 flex items-center gap-4">
