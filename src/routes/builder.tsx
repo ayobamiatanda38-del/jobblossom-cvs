@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import {
   ArrowLeft, Award, BookOpen, BriefcaseBusiness, Check, ChevronDown, ChevronLeft, ChevronRight,
   CircleUserRound, CloudCheck, Download, Eye, FileText, FolderKanban, GraduationCap, Languages,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResumePreview } from "@/components/resume-preview";
+import { RichTextarea } from "@/components/rich-textarea";
 import { AiSuggest } from "@/components/ai-suggest";
 import { PLANS, TEMPLATES, INDUSTRIES, formatUSD, getTemplate, type ResumeData } from "@/lib/templates";
 import { CHECKOUT_MARKETS, marketFor, money, type Country } from "@/lib/checkout-markets";
@@ -64,6 +65,7 @@ function BuilderPage() {
   const search = Route.useSearch();
   const { user } = useSession();
   const navigate = useNavigate();
+  const router = useRouter();
   const [templateId, setTemplateId] = useState(search.template ?? "prime");
   const [data, setData] = useState<ResumeData>(emptyCV(search.template ?? "prime"));
   const [accent, setAccent] = useState<string | undefined>();
@@ -133,7 +135,7 @@ function BuilderPage() {
   return <div className="min-h-screen bg-muted text-foreground">
     <header className="sticky top-0 z-40 grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-line bg-paper px-2 sm:h-16 sm:px-5">
       <div className="flex min-w-0 items-center gap-2">
-        <Button variant="ghost" size="icon" asChild title="Back"><Link to="/"><ArrowLeft /></Link></Button>
+        <Button variant="ghost" size="icon" title="Back" onClick={() => router.history.back()}><ArrowLeft /></Button>
         <Link to="/" className="hidden items-center gap-2 font-bold sm:flex"><span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground"><FileText className="size-4" /></span>JobPrimed</Link>
         <div className="min-w-0 sm:ml-3 sm:border-l sm:border-line sm:pl-3">
           <p className="truncate text-sm font-semibold">{data.name || "Untitled"} — {t.name}</p>
@@ -164,7 +166,7 @@ function BuilderPage() {
         <div className="mx-auto max-w-xl p-4 sm:p-7">
           <p className="text-xs font-bold uppercase text-primary">Step {idx + 1} of {SECTIONS.length}</p>
           <h1 className="mt-1 font-display text-3xl">{SECTIONS[idx]!.label}</h1>
-          <div className="mt-6"><Editor active={active} data={data} up={up} isPro={isPro} needPro={needPro} accent={accent ?? t.accent} setAccent={setAccent} openTemplates={() => setTemplateOpen(true)} templateName={t.name} /></div>
+          <div className="mt-6"><Editor active={active} data={data} up={up} isPro={isPro} needPro={needPro} accent={accent ?? t.accent} setAccent={setAccent} openTemplates={() => setTemplateOpen(true)} templateName={t.name} photoTemplate={!!t.photo} /></div>
           {TIPS[active] && <div className="mt-6 border border-line bg-sky/60 p-4 text-sm"><p className="mb-2 flex items-center gap-2 font-bold"><Lightbulb className="size-4 text-primary" />Recruiter tips</p><ul className="list-disc space-y-1 pl-5 text-muted-foreground">{TIPS[active]!.map((x) => <li key={x}>{x}</li>)}</ul></div>}
           <div className="mt-8 flex justify-between"><Button variant="ghost" disabled={idx === 0} onClick={() => go(-1)}><ChevronLeft />Back</Button>
             {(active === "design" || (!isPro && active === "skills")) ? <Button onClick={download}><Download />Finish & download</Button> : <Button onClick={() => go(1)}>Next<ChevronRight /></Button>}</div>
@@ -195,26 +197,33 @@ function BuilderPage() {
     <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0 w-[794px]"><div id="cv-export"><ResumePreview data={isPro ? data : freeCV(data)} template={t} accent={accent} className="shadow-none" /></div></div>
 
     <TemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} data={data} current={templateId} isPro={isPro} onPick={(id) => { setTemplateId(id); setAccent(undefined); setTemplateOpen(false); }} />
-    <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} email={user?.email} paid={paid} />
+    <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} email={user?.email} paid={paid} loggedIn={!!user} />
     <ExportDialog open={exportOpen} onOpenChange={setExportOpen} name={data.name} />
   </div>;
 }
 
-function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTemplates, templateName }: {
+function Editor({ active, data, up, isPro, needPro, accent, setAccent, openTemplates, templateName, photoTemplate }: {
   active: SectionId; data: ResumeData; up: <K extends keyof ResumeData>(k: K, v: ResumeData[K]) => void; isPro: boolean; needPro: () => void;
-  accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string;
+  accent: string; setAccent: (c: string) => void; openTemplates: () => void; templateName: string; photoTemplate: boolean;
 }) {
   const join = (a: string, b: string, sep: string) => (a.trim() ? `${a.trim()}${sep}${b}` : b);
   const text = (k: keyof ResumeData, label: string, hint?: string) => { const cur = (data[k] as string) ?? ""; const sep = k === "skills" || k === "strengths" ? ", " : "\n"; return <div><Label htmlFor={k}>{label}</Label><Textarea id={k} rows={7} className="mt-2 bg-paper" value={cur} placeholder={PLACEHOLDERS[k] ?? `Add your ${label.toLowerCase()} here…`} onChange={(e) => up(k, e.target.value as never)} />{hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}<AiSuggest jobTitle={data.title} section={label} current={cur} onUse={(t, m) => up(k, (m === "append" ? join(cur, t, sep) : t) as never)} /></div>; };
   switch (active) {
     case "personal": return <div className="grid gap-4 sm:grid-cols-2">
+      {photoTemplate && <div className="sm:col-span-2 flex items-center gap-4">
+        <label className={`relative grid size-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-dashed border-line bg-paper transition-opacity ${data.showPhoto === false ? "opacity-40" : ""}`} title="Upload your photo">
+          {data.photo ? <img src={data.photo} alt="Your photo" className="size-full object-cover" /> : <CircleUserRound className="size-7 text-muted-foreground" />}
+          <input type="file" accept="image/*" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => up("photo", String(r.result)); r.readAsDataURL(f); }} />
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" className="accent-primary" checked={data.showPhoto !== false} onChange={(e) => up("showPhoto", e.target.checked)} />Show photo on my resume</label>
+      </div>}
       <F label="Full name" v={data.name} on={(v) => up("name", v)} /><F label="Job title" v={data.title} on={(v) => up("title", v)} />
       <F label="Email" v={data.email} on={(v) => up("email", v)} /><F label="Phone" v={data.phone} on={(v) => up("phone", v)} />
       <F label="City, Country" v={data.location} on={(v) => up("location", v)} /><F label="Website / LinkedIn" v={data.website} on={(v) => up("website", v)} />
     </div>;
     case "profile": return <div>{text("summary", "Professional summary")}<p className="mt-1 text-right text-xs text-muted-foreground">{data.summary.length} characters</p></div>;
     case "experience": return <List items={data.experience} onChange={(v) => up("experience", v)} blank={{ role: "", company: "", period: "", details: "" }} title={(e) => e.role || "New position"}
-      render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><Textarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(x) => set({ ...e, details: x.target.value })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>} />;
+      render={(e, set) => { const parts = e.period.split(" — "); const from = parts[0] ?? ""; const to = parts.slice(1).join(" — "); const current = to === "Present"; const setPeriod = (f: string, t2: string) => set({ ...e, period: f.trim() ? `${f.trim()} — ${t2}` : t2 }); return <div className="grid gap-3 sm:grid-cols-2"><F label="Job title" v={e.role} on={(v) => set({ ...e, role: v })} /><F label="Employer" v={e.company} on={(v) => set({ ...e, company: v })} /><F label="From" v={from} on={(v) => setPeriod(v, current ? "Present" : to)} /><div><Label htmlFor="exp-to">To</Label><Input id="exp-to" className="mt-2 h-11 bg-paper" value={current ? "Present" : to} disabled={current} placeholder="Jan 2022" onChange={(x) => setPeriod(from, x.target.value)} /><label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" className="accent-primary" checked={current} onChange={(x) => setPeriod(from, x.target.checked ? "Present" : "")} />I currently work here</label></div><div className="sm:col-span-2"><Label>Achievements (one per line)</Label><RichTextarea rows={5} className="mt-2 bg-paper" value={e.details} placeholder="Led a team of 5 to improve delivery time by 20%…" onChange={(v) => set({ ...e, details: v })} /><AiSuggest jobTitle={e.role || data.title} section="Work experience achievements" context={e.company ? `Employer: ${e.company}` : undefined} current={e.details} onUse={(t, m) => set({ ...e, details: m === "append" ? join(e.details, t, "\n") : t })} /></div></div>; }} />;
     case "education": return <List items={data.education} onChange={(v) => up("education", v)} blank={{ degree: "", school: "", period: "" }} title={(e) => e.degree || "New qualification"}
       render={(e, set) => <div className="grid gap-3 sm:grid-cols-2"><F label="Degree" v={e.degree} on={(v) => set({ ...e, degree: v })} /><F label="School" v={e.school} on={(v) => set({ ...e, school: v })} /><div className="sm:col-span-2"><F label="Dates" v={e.period} on={(v) => set({ ...e, period: v })} /></div></div>} />;
     case "skills": return text("skills", "Skills", "Separate with commas — each becomes a tag.");
@@ -260,7 +269,7 @@ function TemplateDialog({ open, onOpenChange, data, current, isPro, onPick }: { 
   </DialogContent></Dialog>;
 }
 
-function CheckoutDialog({ open, onOpenChange, email, paid }: { open: boolean; onOpenChange: (o: boolean) => void; email?: string | undefined; paid: boolean }) {
+function CheckoutDialog({ open, onOpenChange, email, paid, loggedIn }: { open: boolean; onOpenChange: (o: boolean) => void; email?: string | undefined; paid: boolean; loggedIn: boolean }) {
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<(typeof PLANS)[number]["id"]>("month");
   const [mail, setMail] = useState(email ?? "");
@@ -275,7 +284,9 @@ function CheckoutDialog({ open, onOpenChange, email, paid }: { open: boolean; on
   const p = PLANS.find((x) => x.id === plan)!;
   const market = marketFor(country);
   const ngn = quote ? `₦${Math.round(quote.amountKobo / 100).toLocaleString("en-NG")}` : "";
+  const navigate = useNavigate();
   const prepare = async () => {
+    if (!loggedIn) { onOpenChange(false); navigate({ to: "/auth", search: { mode: "signin", redirect: "/builder?checkout=true" } }); return; }
     setBusy(true); setErr("");
     try {
       const q = await quoteFn({ data: { plan, country } });
