@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site-header";
+import { ResumeUpload } from "@/components/resume-upload";
 
 export const Route = createFileRoute("/cover-letter-drafter")({
   head: () => ({ meta: [
-    { title: "AI Cover Letter Drafter — JobPrimed" }, { name: "description", content: "Paste a job description and your resume to get a tailored cover letter grounded only in your real experience." },
-    { property: "og:title", content: "AI Cover Letter Drafter — JobPrimed" }, { property: "og:description", content: "A tailored cover letter that never invents experience you don't have." },
+    { title: "Build Your Cover Letter — JobPrimed" }, { name: "description", content: "Upload your resume and paste a job description to get a tailored cover letter grounded only in your real experience." },
+    { property: "og:title", content: "Build Your Cover Letter — JobPrimed" }, { property: "og:description", content: "A tailored cover letter that never invents experience you don't have." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }), component: Drafter,
 });
@@ -46,11 +47,11 @@ function Drafter() {
   const ready = resume.trim().length >= 50 && job.trim().length >= 50;
   return <div className="min-h-screen bg-background"><SiteHeader /><main className="mx-auto max-w-5xl px-5 py-12 sm:py-20">
     <Button variant="ghost" asChild><Link to="/"><ArrowLeft />Home</Link></Button>
-    <h1 className="mt-6 font-display text-4xl sm:text-6xl">AI cover letter drafter</h1>
+    <h1 className="mt-6 font-display text-4xl sm:text-6xl">Build your cover letter</h1>
     <p className="mt-3 max-w-2xl text-muted-foreground">Get a tailored cover letter built only from experience you actually have. Nothing is invented — gaps are handled honestly.</p>
     <div className="mt-9 grid gap-5 md:grid-cols-2">
       <div><Label htmlFor="job">Job description</Label><Textarea id="job" className="mt-2 min-h-72 bg-paper" placeholder="Paste the job posting here…" value={job} onChange={e => setJob(e.target.value)} /></div>
-      <div><Label htmlFor="resume">Your resume</Label><Textarea id="resume" className="mt-2 min-h-72 bg-paper" placeholder="Paste the text of your CV here…" value={resume} onChange={e => setResume(e.target.value)} /></div>
+      <div><Label>Upload your resume</Label><div className="mt-2"><ResumeUpload onText={setResume} /></div>{resume && <p className="mt-2 text-xs text-muted-foreground">Resume loaded — {resume.length} characters.</p>}</div>
     </div>
     <div className="mt-5 flex flex-wrap items-center gap-3">
       <div className="flex gap-2" role="group" aria-label="Tone">
