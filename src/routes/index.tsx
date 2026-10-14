@@ -7,13 +7,12 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { ResumePreview } from "@/components/resume-preview";
 import { SiteHeader } from "@/components/site-header";
 import { TiltCV } from "@/components/tilt-cv";
-import f1Asset from "@/assets/face-1.jpg.asset.json";
-import f2Asset from "@/assets/face-2.jpg.asset.json";
-import f3Asset from "@/assets/face-3.jpg.asset.json";
-import f4Asset from "@/assets/face-4.jpg.asset.json";
+import f1 from "@/assets/face-1.jpg";
+import f2 from "@/assets/face-2.jpg";
+import f3 from "@/assets/face-3.jpg";
+import f4 from "@/assets/face-4.jpg";
 import { CreateResumeButton } from "@/components/create-resume-button";
 import { BuilderDemo } from "@/components/builder-demo";
-const [f1, f2, f3, f4] = [f1Asset.url, f2Asset.url, f3Asset.url, f4Asset.url];
 import { TEMPLATES, INDUSTRIES, PLANS, formatUSD } from "@/lib/templates";
 
 export const Route = createFileRoute("/")({
@@ -63,7 +62,7 @@ function HomePage() {
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">From first draft to final interview, JobPrimed helps you create a sharp, ATS-ready resume that sounds like you—on your best day.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row"><CreateResumeButton large /><Button size="lg" variant="outline" asChild><Link to="/" hash="examples">Browse examples</Link></Button></div>
             <div className="mt-8 flex flex-wrap items-center gap-4 text-sm"><div className="flex -space-x-2">{[f1,f2,f3,f4].map((src,i)=><img key={i} src={src} alt="JobPrimed user" width={36} height={36} loading="lazy" className="size-9 rounded-full border-2 border-background object-cover" />)}</div><div><div className="flex text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="size-3.5 fill-current" />)}</div><p className="mt-1 text-xs font-medium text-foreground/80">Made for every stage of your career</p></div></div>
-            <div className="mt-6 flex flex-wrap gap-3">{[["Trustpilot","4.8","2,140 reviews"],["Google","4.9","860 reviews"],["Capterra","4.7","310 reviews"]].map(([n,r,c])=><div key={n} className="flex items-center gap-2 rounded-md border border-line bg-paper px-3 py-2 text-xs"><span className="flex text-mint-strong">{Array.from({length:5}).map((_,i)=><Star key={i} className="size-3 fill-current" />)}</span><span><b>{n}</b> {r} · <span className="text-muted-foreground">{c}</span></span></div>)}</div>
+            <div className="mt-6 flex flex-wrap gap-3">{[["Trustpilot","4.8"],["Google","4.9"],["Capterra","4.7"]].map(([n,r])=><div key={n} className="flex items-center gap-2 rounded-md border border-line bg-paper px-3 py-2 text-xs"><span className="flex text-mint-strong">{Array.from({length:5}).map((_,i)=><Star key={i} className="size-3 fill-current" />)}</span><span><b>{n}</b> {r}</span></div>)}</div>
           </div>
           <div className="relative w-full lg:mr-0"><TiltCV /></div>
         </div>
